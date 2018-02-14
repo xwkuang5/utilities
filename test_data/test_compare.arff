@@ -1,0 +1,10 @@
+@relation test.arff
+
+@attribute attr1 numeric
+@attribute attr2 numeric
+@attribute target {-1, 1}
+
+@data
+1.0, 2.0, -1
+2.0, 3.0, -1
+3.0, 4.0, 1
