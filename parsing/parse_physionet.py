@@ -2,8 +2,10 @@ import os
 import re
 import glob
 import operator
-import numpy as np
 import argparse
+import subprocess
+
+import numpy as np
 
 def parse_wfdb_description(desc_filename):
     """Parse the wfdb description files by finding the names of the channels used
@@ -27,8 +29,42 @@ def parse_wfdb_description(desc_filename):
             # TODO: handle exception
             raise
 
-def parse_edf(input_edf, channels=None):
-    pass
+def parse_edf(input_edf, desc_filename, channels, sampling_frequency=256):
+    """Parse the EDF file and extract the specified channels from the recording
+
+    Parameters:
+        input_edf       - the input edf file, /path/to/edf
+        desc_filename   - the input description file /path/to/description
+        channels        - a list of channel names to be extracted
+    """
+
+    print("processing {} and {}".format(input_edf, desc_filename))
+
+    assert len(channels) != 0, "length of channels must be greater than 0"
+
+    if input_edf[-4:] == ".edf":
+        input_dir = os.path.dirname(input_edf)
+        input_filename = os.path.basename(input_edf)
+
+        arguments = "CWD=`pwd` && cd {} && rdsamp -c -p -H -v -r {} -s"
+
+        output_filename = input_filename[:-4] + ".csv"
+
+        channels_in_edf = parse_wfdb_description(desc_filename)
+
+        for channel in channels:
+            if channel in channels_in_edf:
+                arguments += " {}".format(channels_in_edf.index(channel))
+
+        arguments += " > {} && cd $CWD"
+
+        arguments = arguments.format(input_dir, input_filename, output_filename)
+
+        try:
+            subprocess.run(arguments, shell=True, check=True, executable="/bin/bash")
+        except:
+            # TODO: handle exception
+            raise
 
 def summarize_channels(input_dir):
     """Get a summary about names of the channels used in the recordings in input_dir
