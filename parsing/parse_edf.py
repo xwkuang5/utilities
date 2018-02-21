@@ -12,6 +12,7 @@ import mne
 # suppress warning
 mne.set_log_level(verbose=False)
 
+
 def parse_wfdb_description(desc_filename):
     """Parse the wfdb description files by finding the names of the
     channels used
@@ -35,6 +36,7 @@ def parse_wfdb_description(desc_filename):
         except:
             # TODO: handle exception
             raise
+
 
 def parse_edf_with_mne(input_edf, desc_filename, channels, scale=1):
     """Parse the EDF file and extract the specified channels from the
@@ -63,7 +65,8 @@ def parse_edf_with_mne(input_edf, desc_filename, channels, scale=1):
             channel_idx = channels_in_edf.index(channel)
 
             try:
-                parsed_data.append(scale * mne.io.read_raw_edf(input_edf, preload=True)[channel_idx][0][0])
+                parsed_data.append(scale * mne.io.read_raw_edf(
+                    input_edf, preload=True)[channel_idx][0][0])
             except:
                 # TODO: handle exception
                 raise
@@ -106,15 +109,18 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
         record_labels_filename = label_template.format(record_name)
         record_desc_filename = record_desc_template.format(record_name)
 
-        record_edf = parse_edf_with_mne(record_edf_filename, record_desc_filename, channels, scale)
+        record_edf = parse_edf_with_mne(record_edf_filename,
+                                        record_desc_filename, channels, scale)
         record_labels = np.genfromtxt(record_labels_filename, dtype="str")
 
         record_labels = [label_mapper[label] for label in record_labels]
         record_labels = [label_mapper_to_int[label] for label in record_labels]
 
-        record_dictionary[record_name] = (record_edf, np.asarray(record_labels))
+        record_dictionary[record_name] = (record_edf,
+                                          np.asarray(record_labels))
 
     return record_dictionary
+
 
 def save_record_dictionary(record_dictionary, output_filename):
     """Save record dictionary to a pickle object
@@ -128,6 +134,7 @@ def save_record_dictionary(record_dictionary, output_filename):
     with open(output_filename, "wb") as f:
         pickle.dump(record_dictionary, f)
     f.close()
+
 
 def parse_edf_with_rdsamp(input_edf, desc_filename, channels):
     """Parse the EDF file and extract the specified channels from the
@@ -159,15 +166,21 @@ def parse_edf_with_rdsamp(input_edf, desc_filename, channels):
 
         arguments += " > {} && cd $CWD"
 
-        arguments = arguments.format(input_dir, input_filename, output_filename)
+        arguments = arguments.format(input_dir, input_filename,
+                                     output_filename)
 
         try:
-            subprocess.run(arguments, shell=True, check=True, executable="/bin/bash")
+            subprocess.run(
+                arguments, shell=True, check=True, executable="/bin/bash")
         except:
             # TODO: handle exception
             raise
 
-def parse_csv_records_and_labels(record_names, record_template, label_template, label_mapper=None):
+
+def parse_csv_records_and_labels(record_names,
+                                 record_template,
+                                 label_template,
+                                 label_mapper=None):
     """Parse all csv records and labels and return dictionary mapping
     record_name to (record, label) pair
 
@@ -190,7 +203,8 @@ def parse_csv_records_and_labels(record_names, record_template, label_template, 
         record_edf_filename = record_template.format(record_name)
         record_labels_filename = label_template.format(record_name)
 
-        record_edf = np.loadtxt(record_edf_filename, skiprows=2, delimiter=",", usecols=1)
+        record_edf = np.loadtxt(
+            record_edf_filename, skiprows=2, delimiter=",", usecols=1)
         record_labels = np.genfromtxt(record_labels_filename, dtype="str")
 
         if label_mapper != None:
@@ -199,6 +213,7 @@ def parse_csv_records_and_labels(record_names, record_template, label_template, 
         record_dictionary[record_name] = (record_edf, record_labels)
 
     return record_dictionary
+
 
 def summarize_channels(input_dir):
     """Get a summary about names of the channels used in the recordings in input_dir
@@ -224,18 +239,29 @@ def summarize_channels(input_dir):
 
     for filename in filenames:
         matches = parse_wfdb_description(filename)
-        all_possible_channels = update_dictionary(all_possible_channels, matches)
+        all_possible_channels = update_dictionary(all_possible_channels,
+                                                  matches)
 
-    all_possible_channels = sorted(all_possible_channels.items(), key=operator.itemgetter(1), reverse=True)
+    all_possible_channels = sorted(
+        all_possible_channels.items(),
+        key=operator.itemgetter(1),
+        reverse=True)
 
     print(all_possible_channels)
+
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="/path/to/input")
-    ap.add_argument("--channels", required=False, help="list of channels (integers) to extract for the input edf file, separated by ,")
+    ap.add_argument(
+        "--channels",
+        required=False,
+        help=
+        "list of channels (integers) to extract for the input edf file, separated by ,"
+    )
 
     args = vars(ap.parse_args())
+
 
 if __name__ == "__main__":
     main()

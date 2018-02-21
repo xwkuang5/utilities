@@ -3,7 +3,12 @@ import matplotlib.pyplot as plt
 
 colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'black']
 
-def vis_sleep_stages_distribution(records, filenames_template, label_mapper, sleep_stages=['W', '1', '2', '3', 'R', '?'], title="sleep stages distribution"):
+
+def vis_sleep_stages_distribution(records,
+                                  filenames_template,
+                                  label_mapper,
+                                  sleep_stages=['W', '1', '2', '3', 'R', '?'],
+                                  title="sleep stages distribution"):
     """Visualize sleep stages distribution with bar graph
 
     Parameters:
@@ -17,7 +22,8 @@ def vis_sleep_stages_distribution(records, filenames_template, label_mapper, sle
     sleep_stages_info = []
 
     for record in records:
-        keep_sleep_stages_dict = dict(zip(sleep_stages, [0] * len(sleep_stages)))
+        keep_sleep_stages_dict = dict(
+            zip(sleep_stages, [0] * len(sleep_stages)))
 
         filename = filenames_template.format(record)
 
@@ -31,17 +37,28 @@ def vis_sleep_stages_distribution(records, filenames_template, label_mapper, sle
             if label in keys:
                 keep_sleep_stages_dict[label] += 1
 
-        sleep_stages_info.append([keep_sleep_stages_dict[label] for label in sorted_keys])
+        sleep_stages_info.append(
+            [keep_sleep_stages_dict[label] for label in sorted_keys])
 
-    sleep_stages_info = np.asarray(np.stack(sleep_stages_info), dtype=np.float64)
+    sleep_stages_info = np.asarray(
+        np.stack(sleep_stages_info), dtype=np.float64)
 
-    sleep_stages_info_normed = np.divide(sleep_stages_info, np.sum(sleep_stages_info, axis=1, keepdims=True))
+    sleep_stages_info_normed = np.divide(sleep_stages_info,
+                                         np.sum(
+                                             sleep_stages_info,
+                                             axis=1,
+                                             keepdims=True))
     sleep_stages_info_normed_mean = np.mean(sleep_stages_info_normed, axis=0)
     sleep_stages_info_normed_std = np.std(sleep_stages_info_normed, axis=0)
 
     color = colors[len(sleep_stages) % 6]
     ind = np.arange(len(sleep_stages))
-    plt.bar(ind, sleep_stages_info_normed_mean, color=color, yerr=sleep_stages_info_normed_std, align='center')
+    plt.bar(
+        ind,
+        sleep_stages_info_normed_mean,
+        color=color,
+        yerr=sleep_stages_info_normed_std,
+        align='center')
     plt.xticks(ind, sorted_keys)
     plt.title(title)
     plt.show()

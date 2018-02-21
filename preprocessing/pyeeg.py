@@ -1,5 +1,4 @@
 # coding=UTF-8
-
 """Copyleft 2010-2015 Forrest Sheng Bao http://fsbao.net
    Copyleft 2010 Xin Liu
    Copyleft 2014-2015 Borzou Alipour Fard
@@ -34,8 +33,8 @@ Functions listed alphabetically
 from __future__ import print_function
 import numpy
 
-
 # ####################### Begin function definitions #######################
+
 
 def hurst(X):
     """ Compute the Hurst exponent of X. If the output H=0.5,the behavior
@@ -217,11 +216,8 @@ def bin_power(X, Band, Fs):
     for Freq_Index in range(0, len(Band) - 1):
         Freq = float(Band[Freq_Index])
         Next_Freq = float(Band[Freq_Index + 1])
-        Power[Freq_Index] = sum(
-            C[numpy.floor(
-                Freq / Fs * len(X)
-            ): numpy.floor(Next_Freq / Fs * len(X))]
-        )
+        Power[Freq_Index] = sum(C[numpy.floor(Freq / Fs * len(X)):numpy.floor(
+            Next_Freq / Fs * len(X))])
     Power_Ratio = Power / sum(Power)
     return Power, Power_Ratio
 
@@ -248,8 +244,7 @@ def pfd(X, D=None):
             N_delta += 1
     n = len(X)
     return numpy.log10(n) / (
-        numpy.log10(n) + numpy.log10(n / n + 0.4 * N_delta)
-    )
+        numpy.log10(n) + numpy.log10(n / n + 0.4 * N_delta))
 
 
 def hfd(X, Kmax):
@@ -320,16 +315,15 @@ def hjorth(X, D=None):
 
     n = len(X)
 
-    M2 = float(sum(D ** 2)) / n
-    TP = sum(numpy.array(X) ** 2)
+    M2 = float(sum(D**2)) / n
+    TP = sum(numpy.array(X)**2)
     M4 = 0
     for i in range(1, len(D)):
-        M4 += (D[i] - D[i - 1]) ** 2
+        M4 += (D[i] - D[i - 1])**2
     M4 = M4 / n
 
     return numpy.sqrt(M2 / TP), numpy.sqrt(
-        float(M4) * TP / M2 / M2
-    )  # Hjorth Mobility and Complexity
+        float(M4) * TP / M2 / M2)  # Hjorth Mobility and Complexity
 
 
 def spectral_entropy(X, Band, Fs, Power_Ratio=None):
@@ -388,8 +382,7 @@ def spectral_entropy(X, Band, Fs, Power_Ratio=None):
     for i in range(0, len(Power_Ratio) - 1):
         Spectral_Entropy += Power_Ratio[i] * numpy.log(Power_Ratio[i])
     Spectral_Entropy /= numpy.log(
-        len(Power_Ratio)
-    )  # to save time, minus one is omitted
+        len(Power_Ratio))  # to save time, minus one is omitted
     return -1 * Spectral_Entropy
 
 
@@ -517,12 +510,14 @@ def ap_entropy(X, M, R):
     Em = embed_seq(X, 1, M)
     A = numpy.tile(Em, (len(Em), 1, 1))
     B = numpy.transpose(A, [1, 0, 2])
-    D = numpy.abs(A - B) #  D[i,j,k] = |Em[i][k] - Em[j][k]|
+    D = numpy.abs(A - B)  #  D[i,j,k] = |Em[i][k] - Em[j][k]|
     InRange = numpy.max(D, axis=2) <= R
-    Cm = InRange.mean(axis=0) #  Probability that random M-sequences are in range
+    Cm = InRange.mean(
+        axis=0)  #  Probability that random M-sequences are in range
 
     # M+1-sequences in range iff M-sequences are in range & last values are close
-    Dp = numpy.abs(numpy.tile(X[M:], (N - M, 1)) - numpy.tile(X[M:], (N - M, 1)).T)
+    Dp = numpy.abs(
+        numpy.tile(X[M:], (N - M, 1)) - numpy.tile(X[M:], (N - M, 1)).T)
     Cmp = numpy.logical_and(Dp <= R, InRange[:-1, :-1]).mean(axis=0)
 
     # Uncomment for old (miscounted) version
@@ -582,13 +577,15 @@ def samp_entropy(X, M, R):
     Em = embed_seq(X, 1, M)
     A = numpy.tile(Em, (len(Em), 1, 1))
     B = numpy.transpose(A, [1, 0, 2])
-    D = numpy.abs(A - B) #  D[i,j,k] = |Em[i][k] - Em[j][k]|
+    D = numpy.abs(A - B)  #  D[i,j,k] = |Em[i][k] - Em[j][k]|
     InRange = numpy.max(D, axis=2) <= R
-    numpy.fill_diagonal(InRange, 0) #  Don't count self-matches
+    numpy.fill_diagonal(InRange, 0)  #  Don't count self-matches
 
-    Cm = InRange.sum(axis=0) #  Probability that random M-sequences are in range
-    Dp = numpy.abs(numpy.tile(X[M:], (N - M, 1)) - numpy.tile(X[M:], (N - M, 1)).T)
-    Cmp = numpy.logical_and(Dp <= R, InRange[:-1,:-1]).sum(axis=0)
+    Cm = InRange.sum(
+        axis=0)  #  Probability that random M-sequences are in range
+    Dp = numpy.abs(
+        numpy.tile(X[M:], (N - M, 1)) - numpy.tile(X[M:], (N - M, 1)).T)
+    Cmp = numpy.logical_and(Dp <= R, InRange[:-1, :-1]).sum(axis=0)
     # Uncomment below for old (miscounted) version
     #InRange[numpy.triu_indices(len(InRange))] = 0
     #InRange = InRange[:-1,:-2]
@@ -702,14 +699,15 @@ def dfa(X, Ave=None, L=None):
     Y -= Ave
 
     if L is None:
-        L = numpy.floor(len(X) * 1 / (
-            2 ** numpy.array(list(range(4, int(numpy.log2(len(X))) - 4))))
-        )
+        L = numpy.floor(
+            len(X) * 1 /
+            (2**numpy.array(list(range(4,
+                                       int(numpy.log2(len(X))) - 4)))))
 
     F = numpy.zeros(len(L))  # F(n) of different given box length n
 
     for i in range(0, len(L)):
-        n = int(L[i])                        # for each box length L[i]
+        n = int(L[i])  # for each box length L[i]
         if n == 0:
             print("time series is too short while the box length is too big")
             print("abort")
@@ -726,9 +724,8 @@ def dfa(X, Ave=None, L=None):
         F[i] /= ((len(X) / n) * n)
     F = numpy.sqrt(F)
 
-    Alpha = numpy.linalg.lstsq(numpy.vstack(
-        [numpy.log(L), numpy.ones(len(L))]
-    ).T, numpy.log(F))[0][0]
+    Alpha = numpy.linalg.lstsq(
+        numpy.vstack([numpy.log(L), numpy.ones(len(L))]).T, numpy.log(F))[0][0]
 
     return Alpha
 
@@ -765,7 +762,8 @@ def permutation_entropy(x, n, tau):
 
     Notes
     ----------
-    Suppose the given time series is X =[x(1),x(2),x(3),x(N)].
+    Suppose the given time series is X =[x(1),x(2),x(3),
+x(N)].
     We first build embedding matrix Em, of dimension(n*N-n+1),
     such that the ith row of Em is x(i),x(i+1),..x(i+n-1). Hence
     the embedding lag and the embedding dimension are 1 and n
@@ -946,7 +944,7 @@ def information_based_similarity(x, y, n):
     for i in range(0, 2):
         Encoder = numpy.diff(Input[i])
         for j in range(0, len(Input[i]) - 1):
-            if(Encoder[j] > 0):
+            if (Encoder[j] > 0):
                 SymbolicSeq[i].append(1)
             else:
                 SymbolicSeq[i].append(0)
@@ -1079,13 +1077,15 @@ def LLE(x, tau, n, T, fs):
     M = len(Em)
     A = numpy.tile(Em, (len(Em), 1, 1))
     B = numpy.transpose(A, [1, 0, 2])
-    square_dists = (A - B) ** 2 #  square_dists[i,j,k] = (Em[i][k]-Em[j][k])^2
-    D = numpy.sqrt(square_dists[:,:,:].sum(axis=2)) #  D[i,j] = ||Em[i]-Em[j]||_2
+    square_dists = (A - B)**2  #  square_dists[i,j,k] = (Em[i][k]-Em[j][k])^2
+    D = numpy.sqrt(
+        square_dists[:, :, :].sum(axis=2))  #  D[i,j] = ||Em[i]-Em[j]||_2
 
     # Exclude elements within T of the diagonal
-    band = numpy.tri(D.shape[0], k=T) - numpy.tri(D.shape[0], k=-T-1)
+    band = numpy.tri(D.shape[0], k=T) - numpy.tri(D.shape[0], k=-T - 1)
     band[band == 1] = numpy.inf
-    neighbors = (D + band).argmin(axis=0) #  nearest neighbors more than T steps away
+    neighbors = (D + band).argmin(
+        axis=0)  #  nearest neighbors more than T steps away
 
     # in_bounds[i,j] = (i+j <= M-1 and i+neighbors[j] <= M-1)
     inc = numpy.tile(numpy.arange(M), (M, 1))
@@ -1099,7 +1099,8 @@ def LLE(x, tau, n, T, fs):
 
     # neighbor_dists[i,j] = ||Em[i+j]-Em[i+neighbors[j]]||_2
     neighbor_dists = numpy.ma.MaskedArray(D[row_inds, col_inds], -in_bounds)
-    J = (-neighbor_dists.mask).sum(axis=1) #  number of in-bounds indices by row
+    J = (-neighbor_dists.mask).sum(
+        axis=1)  #  number of in-bounds indices by row
     # Set invalid (zero) values to 1; log(1) = 0 so sum is unchanged
     neighbor_dists[neighbor_dists == 0] = 1
     d_ij = numpy.sum(numpy.log(neighbor_dists.data), axis=1)

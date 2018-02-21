@@ -5,17 +5,21 @@ import numpy as np
 from eeg_extract_features import extract_features
 from classification_formater import write_ucr_data_with_filename
 
+
 def down_sampling(record, down_sampling_factor=16):
     """Perform down sampling on the input record
 
     Parameters:
         record                  - 1-D numpy array of type float
                                   In the case of 2-D array, down
-                                  sampling is applied on the second axis (axis=1)
-        down_sampling_factor    - int, the down sampling factor to be applied
+                                  sampling is applied on the second axis
+                                  (axis=1)
+        down_sampling_factor    - int, the down sampling factor to be
+                                  applied
 
     Returns:
-        record_down_sampled     - A numpy array of type float, down sampled version
+        record_down_sampled     - A numpy array of type float, down
+                                  sampled version
     """
 
     if len(record.shape) == 1:
@@ -25,6 +29,7 @@ def down_sampling(record, down_sampling_factor=16):
         col_idx = np.arange(0, record.shape[1], down_sampling_factor)
 
         return record[np.ix_(row_idx, col_idx)]
+
 
 def windowing(parsed_record, labels, sampling_frequency=256, window_length=30):
     """Split the input record into multiple windows of length window_length
@@ -43,20 +48,30 @@ def windowing(parsed_record, labels, sampling_frequency=256, window_length=30):
                                m corresponds to the number of samples
     """
 
-    num_windows = int(parsed_record.shape[1] / sampling_frequency / window_length)
+    num_windows = int(
+        parsed_record.shape[1] / sampling_frequency / window_length)
 
     assert num_windows == labels.shape[0], "labels do not match with data"
 
     num_samples_per_window = sampling_frequency * window_length
 
-    slices = [slice(i*num_samples_per_window, (i+1)*num_samples_per_window) for i in range(num_windows)]
+    slices = [
+        slice(i * num_samples_per_window, (i + 1) * num_samples_per_window)
+        for i in range(num_windows)
+    ]
 
     # TODO: use np.split to avoid copying data
-    windows = np.stack([np.stack([parsed_record[i, one_slice] for one_slice in slices]) for i in range(parsed_record.shape[0])])
+    windows = np.stack([
+        np.stack([parsed_record[i, one_slice] for one_slice in slices])
+        for i in range(parsed_record.shape[0])
+    ])
 
     return windows
 
-def perform_windowing_on_dict(record_dictionary, sampling_frequency=256, window_length=30):
+
+def perform_windowing_on_dict(record_dictionary,
+                              sampling_frequency=256,
+                              window_length=30):
     """Perform windowing operation on every record data in the record_dictionary
 
     Parameters:
@@ -81,9 +96,11 @@ def perform_windowing_on_dict(record_dictionary, sampling_frequency=256, window_
     for key in record_dictionary:
         data, labels = record_dictionary[key]
 
-        windowed_dictionary[key] = (windowing(data, labels, sampling_frequency, window_length), labels)
+        windowed_dictionary[key] = (windowing(data, labels, sampling_frequency,
+                                              window_length), labels)
 
     return windowed_dictionary
+
 
 def train_test_split(record_dictionary, ratio=.5):
     """Split the record_dictionary into training set and testing set
@@ -107,15 +124,26 @@ def train_test_split(record_dictionary, ratio=.5):
 
     keys = list(record_dictionary.keys())
 
-    training_records = np.random.choice(keys, num_training_records, replace=False)
+    training_records = np.random.choice(
+        keys, num_training_records, replace=False)
     testing_records = [key for key in keys if key not in training_records]
 
-    training_dictionary = {record: record_dictionary[record] for record in training_records}
-    testing_dictionary = {record: record_dictionary[record] for record in testing_records}
+    training_dictionary = {
+        record: record_dictionary[record]
+        for record in training_records
+    }
+    testing_dictionary = {
+        record: record_dictionary[record]
+        for record in testing_records
+    }
 
     return training_dictionary, testing_dictionary
 
-def create_shapelets_datasets(record_dictionary, channel, channels, down_sampling_factor=16):
+
+def create_shapelets_datasets(record_dictionary,
+                              channel,
+                              channels,
+                              down_sampling_factor=16):
     """Create datasets for shapelets algorithm
 
     Parameters:
@@ -152,7 +180,8 @@ def create_shapelets_datasets(record_dictionary, channel, channels, down_samplin
         record_data, record_labels = record_dictionary[key]
 
         # (w, m/df)
-        down_sampled_data = down_sampling(record_data[channel_idx], down_sampling_factor)
+        down_sampled_data = down_sampling(record_data[channel_idx],
+                                          down_sampling_factor)
 
         data.append(down_sampled_data)
         labels.append(record_labels)
@@ -163,7 +192,9 @@ def create_shapelets_datasets(record_dictionary, channel, channels, down_samplin
 
     return data, labels, sorted_records, sorted_record_sep
 
-def create_eeg_features_dataset(record_dictionary, channel, channels, sampling_frequency, feature_dict):
+
+def create_eeg_features_dataset(record_dictionary, channel, channels,
+                                sampling_frequency, feature_dict):
     """Create EEG features dataset
 
     TODO: multiple channels
@@ -201,7 +232,8 @@ def create_eeg_features_dataset(record_dictionary, channel, channels, sampling_f
         extracted_labels = []
 
         for i in range(record_data_single_channel.shape[0]):
-            features = extract_features(record_data_single_channel[i], sampling_frequency, feature_dict)
+            features = extract_features(record_data_single_channel[i],
+                                        sampling_frequency, feature_dict)
             # if feature extraction succeeds, add windows
             """
             For 0906152-1, originally there are 1110 windows, after this preprocessing,
@@ -225,16 +257,23 @@ def create_eeg_features_dataset(record_dictionary, channel, channels, sampling_f
 
     return data, labels, sorted_records, sorted_record_sep
 
-def save_eeg_features_datasets(output_dir, prefix, data, labels, sorted_records, sorted_record_sep):
+
+def save_eeg_features_datasets(output_dir, prefix, data, labels,
+                               sorted_records, sorted_record_sep):
     """Persist eeg features dataset to hard disk
 
     Parameters:
         output_dir          - string, /path/to/output/dir
-        prefix              - string, prefix to the output, e.g., TRAINING/TESTING
+        prefix              - string, prefix to the output, e.g.,
+                              TRAINING/TESTING
         data                - (n, m) 2-D numpy array of float
         labels              - (n,) 1-D numpy array of integer
-        sorted_records      - list of string, a list of record names where the order of the elements corresponds to the data
-        sorted_record_sep   - list of int, a list of record length where the order of the elements corresponds to the data
+        sorted_records      - list of string, a list of record names
+                              where the order of the elements corresponds
+                              to the data
+        sorted_record_sep   - list of int, a list of record length where
+                              the order of the elements corresponds to
+                              the data
     """
 
     if not os.path.exists(output_dir):
@@ -251,16 +290,23 @@ def save_eeg_features_datasets(output_dir, prefix, data, labels, sorted_records,
         pickle.dump((sorted_records, sorted_record_sep), f)
     f.close()
 
-def save_shapelets_datasets_ucr(output_dir, prefix, data, labels, sorted_records, sorted_record_sep):
-    """Persist eeg features dataset to hard disk
+
+def save_shapelets_datasets_ucr(output_dir, prefix, data, labels,
+                                sorted_records, sorted_record_sep):
+    """Persist shapelets features dataset to hard disk
 
     Parameters:
         output_dir          - string, /path/to/output/dir
-        prefix              - string, prefix to the output, e.g., TRAINING/TESTING
+        prefix              - string, prefix to the output, e.g.,
+                              TRAINING/TESTING
         data                - (n, m) 2-D numpy array of float
         labels              - (n,) 1-D numpy array of integer
-        sorted_records      - list of string, a list of record names where the order of the elements corresponds to the data
-        sorted_record_sep   - list of int, a list of record length where the order of the elements corresponds to the data
+        sorted_records      - list of string, a list of record names
+                              where the order of the elements corresponds
+                              to the data
+        sorted_record_sep   - list of int, a list of record length where
+                              the order of the elements corresponds to
+                              the data
     """
 
     if not os.path.exists(output_dir):
@@ -269,7 +315,8 @@ def save_shapelets_datasets_ucr(output_dir, prefix, data, labels, sorted_records
     ucr_data_template = "{}/{}_shapelets"
     record_info_template = "{}/{}_shapelets_record_info"
 
-    write_ucr_data_with_filename(ucr_data_template.format(output_dir, prefix), labels, data)
+    write_ucr_data_with_filename(
+        ucr_data_template.format(output_dir, prefix), labels, data)
 
     with open(record_info_template.format(output_dir, prefix), "wb") as f:
         pickle.dump((sorted_records, sorted_record_sep), f)

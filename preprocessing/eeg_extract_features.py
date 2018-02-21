@@ -28,7 +28,7 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
     signal_length = len(signal)
     signal_fft = np.fft.fft(signal)
     signal_amplitude_spectrum = np.abs(signal_fft)
-    signal_power_spectrum = signal_amplitude_spectrum ** 2
+    signal_power_spectrum = signal_amplitude_spectrum**2
 
     signal_first_order_diff = list(np.diff(signal))
 
@@ -36,17 +36,20 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
 
         if feature_name == "PS":
             max_freq = feature_dict["PS"]
-            feature = np.sum(signal_power_spectrum[0:math.floor(max_freq/fs*signal_length)])
+            feature = np.sum(signal_power_spectrum[0:math.floor(
+                max_freq / fs * signal_length)])
             features.append(feature)
 
         elif feature_name == "PR":
             band = feature_dict["PR"]
             assert band != [], "Missing band parameter for calculation of power ratio"
-            power = np.zeros(len(band)-1)
-            for freq_idx in range(len(band)-1):
+            power = np.zeros(len(band) - 1)
+            for freq_idx in range(len(band) - 1):
                 freq = float(band[freq_idx])
-                next_freq = float(band[freq_idx+1])
-                power[freq_idx] = np.sum(signal_power_spectrum[math.floor(freq/fs*signal_length):math.floor(next_freq/fs*signal_length)])
+                next_freq = float(band[freq_idx + 1])
+                power[freq_idx] = np.sum(signal_power_spectrum[math.floor(
+                    freq / fs * signal_length):math.floor(
+                        next_freq / fs * signal_length)])
 
             power_ratio = power / np.sum(power)
 
