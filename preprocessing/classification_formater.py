@@ -2,7 +2,9 @@ import os
 import argparse
 import numpy as np
 
-def write_arff_header_with_file_handle(file_handle, relation_name, target, data):
+
+def write_arff_header_with_file_handle(file_handle, relation_name, target,
+                                       data):
     """Write ARFF relation and attribute into file pointed to by file_handle
 
     Assumption:
@@ -16,7 +18,8 @@ def write_arff_header_with_file_handle(file_handle, relation_name, target, data)
     """
 
     assert target.shape[0] != 0, "target data must have size > 0"
-    assert target.shape[0] == data.shape[0], "shape of target does not match shape of data"
+    assert target.shape[0] == data.shape[
+        0], "shape of target does not match shape of data"
 
     block_str = ""
     relation_str = "@relation " + relation_name + "\n\n"
@@ -28,10 +31,12 @@ def write_arff_header_with_file_handle(file_handle, relation_name, target, data)
         block_str += attribute_template.format(idx)
 
     possible_targets = np.unique(target)
-    target_str = "@attribute target {" + ",".join([str(target) for target in possible_targets]) + "}\n\n"
+    target_str = "@attribute target {" + ",".join(
+        [str(target) for target in possible_targets]) + "}\n\n"
     block_str += target_str
 
     file_handle.write(block_str)
+
 
 def write_arff_data_with_file_handle(file_handle, target, data):
     """Write data into file pointed to by file_handle in ARFF format
@@ -42,7 +47,8 @@ def write_arff_data_with_file_handle(file_handle, target, data):
     data            -- two-diemsnional numpy array (m x n) of data
     """
 
-    assert target.shape[0] == data.shape[0], "shape of target does not match shape of data"
+    assert target.shape[0] == data.shape[
+        0], "shape of target does not match shape of data"
 
     block_str = ""
     block_str += "@data\n"
@@ -54,6 +60,7 @@ def write_arff_data_with_file_handle(file_handle, target, data):
         block_str += line_str
 
     file_handle.write(block_str)
+
 
 def write_ucr_data_with_filename(filename, target, data):
     """Write data into file pointed to by file_handle in UCR format
@@ -71,6 +78,7 @@ def write_ucr_data_with_filename(filename, target, data):
     fmt_str = "%d," + ",".join(["%f"] * data.shape[1])
 
     np.savetxt(filename, dataframe, fmt_str)
+
 
 def from_ucr_to_arff(filename, output):
     """Convert data from ucr format to arff format
@@ -110,7 +118,8 @@ def from_ucr_to_arff(filename, output):
 
             with open(out_filename, "w") as f:
                 relation_name = out_filename.split("/").pop()
-                write_arff_header_with_file_handle(f, relation_name, target, data)
+                write_arff_header_with_file_handle(f, relation_name, target,
+                                                   data)
                 write_arff_data_with_file_handle(f, target, data)
             f.close()
 
@@ -119,10 +128,17 @@ def from_ucr_to_arff(filename, output):
             raise
             # print("Unexpected error:", sys.exc_info()[0])
 
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="/path/to/input")
-    ap.add_argument("--output", required=False, help="/path/to/output, if not provided, .arff is appended to input file when creating the output")
+    ap.add_argument(
+        "--output",
+        required=False,
+        help=
+        "/path/to/output, if not provided, .arff is appended to input \
+        file when creating the output"
+    )
     ap.add_argument("--input_format", required=True, help="ucr")
     ap.add_argument("--output_format", required=True, help="ucr")
 
@@ -130,6 +146,7 @@ def main():
 
     if args["input_format"] == "ucr" and args["output_format"] == "arff":
         from_ucr_to_arff(args["input"], args["output"])
+
 
 if __name__ == "__main__":
     main()
