@@ -1,6 +1,7 @@
 import os
 import re
 import glob
+import pickle
 import operator
 import argparse
 import subprocess
@@ -8,6 +9,7 @@ import subprocess
 import numpy as np
 
 import mne
+# suppress warning
 mne.set_log_level(verbose=False)
 
 def parse_wfdb_description(desc_filename):
@@ -113,6 +115,19 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
         record_dictionary[record_name] = (record_edf, np.asarray(record_labels))
 
     return record_dictionary
+
+def save_record_dictionary(record_dictionary, output_filename):
+    """Save record dictionary to a pickle object
+
+    Parameters:
+        record_dictionary   - dictionary, mapping record_name to pair of
+                              record data and record labels
+        output_filename     - string, /path/to/output
+    """
+
+    with open(output_filename, "wb") as f:
+        pickle.dump(record_dictionary, f)
+    f.close()
 
 def parse_edf_with_rdsamp(input_edf, desc_filename, channels):
     """Parse the EDF file and extract the specified channels from the
