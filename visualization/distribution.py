@@ -62,3 +62,31 @@ def vis_sleep_stages_distribution(records,
     plt.xticks(ind, sorted_keys)
     plt.title(title)
     plt.show()
+
+def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
+                                                  1: '1', \
+                                                  2: '2', \
+                                                  3: '3', \
+                                                  4: 'R'}):
+    """Visualize sleep stages distribution with bar graph
+
+    Parameters:
+        labels          - 1-D numpy array of int
+        title           - string, title of the bar plot
+        label_mapper    - dictionary, label mapper mapping integers to sleep stages 
+    """
+
+    color = "blue"
+    keys = list(label_mapper.keys())
+    values = [np.sum(labels == key) for key in keys]
+    
+    ind = np.arange(len(keys))
+    
+    plt.bar(
+        ind,
+        values,
+        color=color,
+        align='center')
+    plt.xticks(ind, list(label_mapper.values()))
+    plt.title(title)
+    plt.show()
