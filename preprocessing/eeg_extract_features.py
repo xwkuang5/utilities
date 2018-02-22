@@ -58,10 +58,35 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
         elif feature_name == "hjorth_fractal_dimension":
             hfd_param = feature_dict["hjorth_fractal_dimension"]
             features.append(pyeeg.hfd(signal, hfd_param))
+
         elif feature_name == "hjorth":
             hm, hc = pyeeg.hjorth(signal, signal_first_order_diff)
             features.append(hm)
             features.append(hc)
+
+        elif feature_name == "spectral_entropy":
+            band = feature_dict["spectral_entropy"]
+            assert band != [], "Missing band parameter for calculation of power ratio"
+            power = np.zeros(len(band) - 1)
+            for freq_idx in range(len(band) - 1):
+                freq = float(band[freq_idx])
+                next_freq = float(band[freq_idx + 1])
+                power[freq_idx] = np.sum(signal_power_spectrum[math.floor(
+                    freq / fs * signal_length):math.floor(
+                        next_freq / fs * signal_length)])
+
+            power_ratio = power / np.sum(power)
+
+            features.append(pyeeg.spectral_entropy(signal, band, fs, power_ratio))
+
+        elif feature_name == "svd_entropy":
+            embedding_lag, embedding_dimension = feature_dict["svd_entropy"]
+            features.append(pyeeg.svd_entropy(signal, embedding_lag, embedding_dimension))
+
+        elif feature_name == "permutation_entropy":
+            permutation_order, embedding_lag = feature_dict["permutation_entropy"]
+            features.append(pyeeg.permutation_entropy(signal, permutation_order, embedding_lag))
+
         else:
             print("Unknown feature: {}".format(feature_name))
 
