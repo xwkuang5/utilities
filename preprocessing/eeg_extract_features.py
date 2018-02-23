@@ -2,6 +2,7 @@ import numpy as np
 import math
 
 import pyeeg
+import scipy.stats
 
 def extract_features(signal, fs=256, feature_dict={"PS": 30, \
                                                    "PR": [0.5, 4, 7, 13, 16, 30], \
@@ -29,6 +30,8 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
     signal_fft = np.fft.fft(signal)
     signal_amplitude_spectrum = np.abs(signal_fft)
     signal_power_spectrum = signal_amplitude_spectrum**2
+
+    signal_amplitude_spectrum_30Hz = signal_amplitude_spectrum[:math.floor(30*signal_length/fs)]
 
     signal_first_order_diff = list(np.diff(signal))
 
@@ -86,6 +89,24 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
         elif feature_name == "permutation_entropy":
             permutation_order, embedding_lag = feature_dict["permutation_entropy"]
             features.append(pyeeg.permutation_entropy(signal, permutation_order, embedding_lag))
+
+        elif feature_name == "mean":
+            features.append(np.mean(signal))
+
+        elif feature_name == "variance":
+            features.append(np.var(signal))
+
+        elif feature_name == "skewness":
+            features.append(scipy.stats.skew(signal))
+
+        elif feature_name == "kurtosis":
+            features.append(scipy.stats.kurtosis(signal))
+
+        elif feature_name == "spectral_flatness":
+            features.append(scipy.stats.gmean(signal_amplitude_spectrum_30Hz)/np.mean(signal_amplitude_spectrum_30Hz))
+
+        elif feature_name == "spectral_centroid":
+            features.append(np.average(signal_amplitude_spectrum_30Hz)/np.sum(signal_amplitude_spectrum_30Hz))
 
         else:
             print("Unknown feature: {}".format(feature_name))

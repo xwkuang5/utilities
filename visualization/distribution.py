@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'black']
@@ -73,15 +75,15 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
     Parameters:
         labels          - 1-D numpy array of int
         title           - string, title of the bar plot
-        label_mapper    - dictionary, label mapper mapping integers to sleep stages 
+        label_mapper    - dictionary, label mapper mapping integers to sleep stages
     """
 
     color = "blue"
     keys = list(label_mapper.keys())
     values = [np.sum(labels == key) for key in keys]
-    
+
     ind = np.arange(len(keys))
-    
+
     plt.bar(
         ind,
         values,
@@ -89,4 +91,25 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
         align='center')
     plt.xticks(ind, list(label_mapper.values()))
     plt.title(title)
+    plt.show()
+
+def seaborn_pair_plot(data, features_names, labels, label_mapper):
+    """Plot pairwise scatter plot with seaborn
+
+    Parameters:
+        data            : (n, m) 2-D numpy array
+        features_names  : list, or (n,) 1-D array like of string
+        labels          : list, or (n,) 1-D array like
+        label_mapper    : dictionary, mapping label in labels to class
+    """
+
+    labels_names = [label_mapper[label] for label in labels]
+
+    data_frame = pd.DataFrame(data, index=np.arange(data.shape[0]), columns=features_names)
+    data_frame = data_frame.assign(label=pd.Series(labels_names).values)
+
+    sns.set(style="ticks", color_codes=True)
+
+    plot = sns.pairplot(data_frame, hue="label")
+
     plt.show()

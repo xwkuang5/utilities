@@ -77,9 +77,13 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
                              record_desc_template, \
                              label_mapper, \
                              label_mapper_to_int, \
+                             window_length, \
+                             sampling_frequency,
                              scale=1):
     """Parse all records and labels and return dictionary mapping
     record_name to (record, label) pair
+
+    Note: This function makes the assumption that the head of the recording matches with the head of the hypnogram annotation. In case of mismatch between the ends, the longer one is truncated.
 
     Parameters:
         record_names        - list of strings, a list of record names
@@ -91,12 +95,14 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
                               set of standardized sleep stages
         label_mapper_to_int - dictionary, mapping the set of standardized
                               sleep stages to integer
+        window_length       - int, length of the window used in annotation
+        sampling_frequency  - int, sampling frequency of the recording
         scale               - int, scaling factor applied on the raw data values
 
 
     Returns:
         record_dictionary   - dictionary, a dictionary mapping
-        record_name to a (record, label) pair
+                                record_name to a (record, label) pair
                                 record  - (n, m) 2-D numpy array of type float
                                 label   - 1-D numpy array of type str
     """
@@ -115,6 +121,18 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
 
         record_labels = [label_mapper[label] for label in record_labels]
         record_labels = [label_mapper_to_int[label] for label in record_labels]
+
+        recording_windows = int(record_edf.shape[1] / window_length / sampling_frequency)
+
+        # heuristic to prune potentially problematic records
+        if recording_windows < .5*len(record_labels) or recording_windows > 2*len(record_labels):
+            print("Skip {}, length of recording: {}, length of hypnogram: {}".format(record_name, recording_windows, len(record_labels)))
+            continue
+
+        if recording_windows < len(record_labels):
+            record_labels = record_labels[:recording_windows]
+        elif recording_windows > len(record_labels):
+            record_edf = record_edf[:, :len(record_labels)*window_length*sampling_frequency]
 
         record_dictionary[record_name] = (record_edf,
                                           np.asarray(record_labels))
