@@ -8,15 +8,18 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import roc_auc_score
 
-def plot_confusion_matrix(cm, classes,
+
+def plot_confusion_matrix(cm,
+                          classes,
                           normalize=False,
-                          title='Confusion matrix',
+                          title="Confusion matrix",
                           cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
+    """This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
+
+    Note: directly copied from sklearn tutorial
     """
-    
+
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
@@ -33,17 +36,39 @@ def plot_confusion_matrix(cm, classes,
     fmt = '.2f' if normalize else 'd'
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+        plt.text(
+            j,
+            i,
+            format(cm[i, j], fmt),
+            horizontalalignment="center",
+            color="white" if cm[i, j] > thresh else "black")
 
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.show()
 
-def compute_scores(labels, predictions, proba=None, average=None, classes=None, title="Metrics", verbose=True):
-    
+
+def compute_scores(labels,
+                   predictions,
+                   average=None,
+                   classes=None,
+                   title="Metrics",
+                   verbose=True):
+    """Plot f1, precision, recall in matrix form
+
+    TODO: look into roc_auc_score for multiclass
+
+    Parameters:
+        labels          : (n,) 1-D numpy array, ground truth labels
+        predictions     : (n,) 1-D numpy array, predicted labels
+        average         : string, f1, precision, recall score parameter
+        classes         : list of string, names of the classes
+        title           : string, title of the plot
+        verbose         : boolean, if true, print accuracy, f1,
+                          precision, recall score
+    """
+
     scores = {}
     scores["accuracy"] = accuracy_score(labels, predictions)
     scores["f1"] = f1_score(labels, predictions, average=average)
@@ -55,11 +80,11 @@ def compute_scores(labels, predictions, proba=None, average=None, classes=None, 
         print("{:<10}: {}".format("f1", scores["f1"]))
         print("{:<10}: {}".format("precision", scores["precision"]))
         print("{:<10}: {}".format("recall", scores["recall"]))
-    
-    if average == None:
-        num_classes = len(scores["f1"])
 
-        matrix = np.stack([scores["f1"], scores["precision"], scores["recall"]])
+    if average == None:
+
+        matrix = np.stack(
+            [scores["f1"], scores["precision"], scores["recall"]])
 
         plt.imshow(matrix, interpolation='nearest', cmap=plt.cm.Blues)
         plt.title(title)
@@ -73,15 +98,19 @@ def compute_scores(labels, predictions, proba=None, average=None, classes=None, 
 
         fmt = '.2f'
         thresh = matrix.max() / 2.
-        for i, j in itertools.product(range(matrix.shape[0]), range(matrix.shape[1])):
-            plt.text(j, i, format(matrix[i, j], fmt),
-                     horizontalalignment="center",
-                     color="white" if matrix[i, j] > thresh else "black")
+        for i, j in itertools.product(
+                range(matrix.shape[0]), range(matrix.shape[1])):
+            plt.text(
+                j,
+                i,
+                format(matrix[i, j], fmt),
+                horizontalalignment="center",
+                color="white" if matrix[i, j] > thresh else "black")
 
         plt.tight_layout()
         plt.ylabel('Metrics')
         plt.xlabel('Sleep stages')
-        
+
         plt.show()
-    
+
     return scores

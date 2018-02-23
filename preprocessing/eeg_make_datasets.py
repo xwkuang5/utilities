@@ -6,6 +6,7 @@ from eeg_extract_features import extract_features
 from classification_formater import write_ucr_data_with_filename
 from transformation import down_sampling
 
+
 def windowing(parsed_record, labels, sampling_frequency=256, window_length=30):
     """Split the input record into multiple windows of length window_length
 
@@ -25,7 +26,6 @@ def windowing(parsed_record, labels, sampling_frequency=256, window_length=30):
 
     num_windows = int(
         parsed_record.shape[1] / sampling_frequency / window_length)
-
 
     assert num_windows == labels.shape[0], "labels do not match with data"
 
@@ -75,7 +75,8 @@ def perform_windowing_on_dict(record_dictionary,
         data, labels = record_dictionary[key]
 
         try:
-            window = (windowing(data, labels, sampling_frequency, window_length), labels)
+            window = (windowing(data, labels, sampling_frequency,
+                                window_length), labels)
 
             windowed_dictionary[key] = window
         except AssertionError:
@@ -84,10 +85,11 @@ def perform_windowing_on_dict(record_dictionary,
 
     return windowed_dictionary
 
+
 def create_shapelets_dataset(record_dictionary,
-                              channel,
-                              channels,
-                              down_sampling_factor=16):
+                             channel,
+                             channels,
+                             down_sampling_factor=16):
     """Create datasets for shapelets algorithm
 
     Parameters:
@@ -208,6 +210,7 @@ def create_eeg_features_dataset(record_dictionary, channel, channels,
 
     return data, labels, sorted_records, sorted_record_sep
 
+
 def save_shapelets_datasets_ucr(output_dir, prefix, data, labels,
                                 sorted_records, sorted_record_sep):
     """Persist shapelets features dataset to hard disk
@@ -238,6 +241,7 @@ def save_shapelets_datasets_ucr(output_dir, prefix, data, labels,
     with open(record_info_template.format(output_dir, prefix), "wb") as f:
         pickle.dump((sorted_records, sorted_record_sep), f)
     f.close()
+
 
 def save_eeg_features_datasets(output_dir, prefix, data, labels,
                                sorted_records, sorted_record_sep):
@@ -270,4 +274,3 @@ def save_eeg_features_datasets(output_dir, prefix, data, labels,
     with open(record_info_template.format(output_dir, prefix), "wb") as f:
         pickle.dump((sorted_records, sorted_record_sep), f)
     f.close()
-

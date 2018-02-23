@@ -14,9 +14,13 @@ def vis_sleep_stages_distribution(records,
     """Visualize sleep stages distribution with bar graph
 
     Parameters:
-        records                 - list of records for visualization, e.g., ['0906152-1', '0907051-1']
-        filenames_template      - template of the label filename, e.g., "/home/x4kuang/sleep_staging/sunnybrooks_datasets/{}.txt"
-        label_mapper            - a dictionary mapping possible sleep stages to a standardized set of sleep stages, e.g., '1' -> '1', 'N1' -> '1'
+        records                 - list of records for visualization,
+                                  e.g., ['0906152-1', '0907051-1']
+        filenames_template      - template of the label filename,
+                                  e.g., "/home/x4kuang/sleep_staging/sunnybrooks_datasets/{}.txt"
+        label_mapper            - a dictionary mapping possible sleep
+                                  stages to a standardized set of sleep
+                                  stages, e.g., '1' -> '1', 'N1' -> '1'
         sleep_stages            - a list of sleep stages to be visualized
         title                   - title of the bar plot
     """
@@ -75,7 +79,8 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
     Parameters:
         labels          - 1-D numpy array of int
         title           - string, title of the bar plot
-        label_mapper    - dictionary, label mapper mapping integers to sleep stages
+        label_mapper    - dictionary, label mapper mapping integers to
+                          sleep stages
     """
 
     color = "blue"
@@ -84,17 +89,18 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
 
     ind = np.arange(len(keys))
 
-    plt.bar(
-        ind,
-        values,
-        color=color,
-        align='center')
+    plt.bar(ind, values, color=color, align='center')
     plt.xticks(ind, list(label_mapper.values()))
     plt.title(title)
     plt.show()
 
+
 def seaborn_pair_plot(data, features_names, labels, label_mapper):
     """Plot pairwise scatter plot with seaborn
+
+    TODO: add feature selection functions
+          users should be able to give a list of index for which he/she
+          would like to visualize.
 
     Parameters:
         data            : (n, m) 2-D numpy array
@@ -105,7 +111,8 @@ def seaborn_pair_plot(data, features_names, labels, label_mapper):
 
     labels_names = [label_mapper[label] for label in labels]
 
-    data_frame = pd.DataFrame(data, index=np.arange(data.shape[0]), columns=features_names)
+    data_frame = pd.DataFrame(
+        data, index=np.arange(data.shape[0]), columns=features_names)
     data_frame = data_frame.assign(label=pd.Series(labels_names).values)
 
     sns.set(style="ticks", color_codes=True)

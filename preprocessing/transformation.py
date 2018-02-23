@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def down_sampling(record, down_sampling_factor=16):
     """Perform down sampling on the input record
 
@@ -24,7 +25,10 @@ def down_sampling(record, down_sampling_factor=16):
 
         return record[np.ix_(row_idx, col_idx)]
 
-def remove_leading_and_trailing_labels(record_dictionary, labels_to_remove, inplace=True):
+
+def remove_leading_and_trailing_labels(record_dictionary,
+                                       labels_to_remove,
+                                       inplace=True):
     """Remove the labels that are listed from the beginning or the end
 
     Parameters:
@@ -59,12 +63,12 @@ def remove_leading_and_trailing_labels(record_dictionary, labels_to_remove, inpl
             if labels[leading_idx] not in labels_to_remove_set:
                 break
         # trailing
-        for trailing_idx  in reversed(range(labels.shape[0])):
+        for trailing_idx in reversed(range(labels.shape[0])):
             if labels[trailing_idx] not in labels_to_remove_set:
                 break
 
-        extracted_data = data[:, leading_idx:trailing_idx+1, :]
-        extracted_labels = labels[leading_idx:trailing_idx+1]
+        extracted_data = data[:, leading_idx:trailing_idx + 1, :]
+        extracted_labels = labels[leading_idx:trailing_idx + 1]
 
         if inplace:
             record_dictionary[key] = (extracted_data, extracted_labels)
@@ -73,7 +77,6 @@ def remove_leading_and_trailing_labels(record_dictionary, labels_to_remove, inpl
 
     if not inplace:
         return purged_dictionary
-
 
 
 def remove_labels(record_dictionary, labels_to_remove, inplace=True):
@@ -106,15 +109,21 @@ def remove_labels(record_dictionary, labels_to_remove, inplace=True):
 
         data, labels = record_dictionary[key]
 
-        remove_ids = [idx for (idx, val) in enumerate(labels) if val in labels_to_remove_set]
+        remove_ids = [
+            idx for (idx, val) in enumerate(labels)
+            if val in labels_to_remove_set
+        ]
 
         if inplace:
-            record_dictionary[key] = (np.delete(data, remove_ids, 1), np.delete(labels, remove_ids, 0))
+            record_dictionary[key] = (np.delete(data, remove_ids, 1),
+                                      np.delete(labels, remove_ids, 0))
         else:
-            purged_dictionary[key] = (np.delete(data, remove_ids, 1), np.delete(labels, remove_ids, 0))
+            purged_dictionary[key] = (np.delete(data, remove_ids, 1),
+                                      np.delete(labels, remove_ids, 0))
 
     if not inplace:
         return purged_dictionary
+
 
 def balance_classes(data, labels):
     """Balance class distribution in the data
@@ -143,7 +152,10 @@ def balance_classes(data, labels):
 
     min_balanced_number = min([len(l) for l in index_list])
 
-    index_to_take_list = np.concatenate([np.random.choice(l, min_balanced_number, replace=False) for l in index_list])
+    index_to_take_list = np.concatenate([
+        np.random.choice(l, min_balanced_number, replace=False)
+        for l in index_list
+    ])
 
     np.random.shuffle(index_to_take_list)
 
