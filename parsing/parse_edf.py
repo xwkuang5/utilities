@@ -122,17 +122,23 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
         record_labels = [label_mapper[label] for label in record_labels]
         record_labels = [label_mapper_to_int[label] for label in record_labels]
 
-        recording_windows = int(record_edf.shape[1] / window_length / sampling_frequency)
+        recording_windows = int(
+            record_edf.shape[1] / window_length / sampling_frequency)
 
         # heuristic to prune potentially problematic records
-        if recording_windows < .5*len(record_labels) or recording_windows > 2*len(record_labels):
-            print("Skip {}, length of recording: {}, length of hypnogram: {}".format(record_name, recording_windows, len(record_labels)))
+        if recording_windows < .5 * len(
+                record_labels) or recording_windows > 2 * len(record_labels):
+            print("Skip {}, length of recording: {}, length of hypnogram: {}".
+                  format(record_name, recording_windows, len(record_labels)))
             continue
 
+        # For sleep-edf, this happens with the SC* files
         if recording_windows < len(record_labels):
             record_labels = record_labels[:recording_windows]
+        # For sleep-edf, this happens with the ST* files
         elif recording_windows > len(record_labels):
-            record_edf = record_edf[:, :len(record_labels)*window_length*sampling_frequency]
+            record_edf = record_edf[:, :len(record_labels) * window_length *
+                                    sampling_frequency]
 
         record_dictionary[record_name] = (record_edf,
                                           np.asarray(record_labels))

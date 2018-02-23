@@ -31,7 +31,9 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
     signal_amplitude_spectrum = np.abs(signal_fft)
     signal_power_spectrum = signal_amplitude_spectrum**2
 
-    signal_amplitude_spectrum_30Hz = signal_amplitude_spectrum[:math.floor(30*signal_length/fs)]
+    # maximum frequency of interest is hard coded to be 30
+    signal_amplitude_spectrum_30Hz = signal_amplitude_spectrum[:math.floor(
+        30 * signal_length / fs)]
 
     signal_first_order_diff = list(np.diff(signal))
 
@@ -80,15 +82,20 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
 
             power_ratio = power / np.sum(power)
 
-            features.append(pyeeg.spectral_entropy(signal, band, fs, power_ratio))
+            features.append(
+                pyeeg.spectral_entropy(signal, band, fs, power_ratio))
 
         elif feature_name == "svd_entropy":
             embedding_lag, embedding_dimension = feature_dict["svd_entropy"]
-            features.append(pyeeg.svd_entropy(signal, embedding_lag, embedding_dimension))
+            features.append(
+                pyeeg.svd_entropy(signal, embedding_lag, embedding_dimension))
 
         elif feature_name == "permutation_entropy":
-            permutation_order, embedding_lag = feature_dict["permutation_entropy"]
-            features.append(pyeeg.permutation_entropy(signal, permutation_order, embedding_lag))
+            permutation_order, embedding_lag = feature_dict[
+                "permutation_entropy"]
+            features.append(
+                pyeeg.permutation_entropy(signal, permutation_order,
+                                          embedding_lag))
 
         elif feature_name == "mean":
             features.append(np.mean(signal))
@@ -103,10 +110,14 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
             features.append(scipy.stats.kurtosis(signal))
 
         elif feature_name == "spectral_flatness":
-            features.append(scipy.stats.gmean(signal_amplitude_spectrum_30Hz)/np.mean(signal_amplitude_spectrum_30Hz))
+            features.append(
+                scipy.stats.gmean(signal_amplitude_spectrum_30Hz) /
+                np.mean(signal_amplitude_spectrum_30Hz))
 
         elif feature_name == "spectral_centroid":
-            features.append(np.average(signal_amplitude_spectrum_30Hz)/np.sum(signal_amplitude_spectrum_30Hz))
+            features.append(
+                np.average(signal_amplitude_spectrum_30Hz) /
+                np.sum(signal_amplitude_spectrum_30Hz))
 
         else:
             print("Unknown feature: {}".format(feature_name))

@@ -135,10 +135,8 @@ def main():
     ap.add_argument(
         "--output",
         required=False,
-        help=
-        "/path/to/output, if not provided, .arff is appended to input \
-        file when creating the output"
-    )
+        help="/path/to/output, if not provided, .arff is appended to input \
+        file when creating the output")
     ap.add_argument("--input_format", required=True, help="ucr")
     ap.add_argument("--output_format", required=True, help="ucr")
 
