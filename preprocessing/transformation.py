@@ -24,7 +24,59 @@ def down_sampling(record, down_sampling_factor=16):
 
         return record[np.ix_(row_idx, col_idx)]
 
-def remove_labels(record_dictionary, labels_to_remove=[5], inplace=True):
+def remove_leading_and_trailing_labels(record_dictionary, labels_to_remove, inplace=True):
+    """Remove the labels that are listed from the beginning or the end
+
+    Parameters:
+        record_dictionary       - dictionary,
+                                  key: record_name
+                                  values: (record_data, record_labels)
+                                  record_data: (n, w, m) numpy array
+                                  record_labels: (w,) numpy array
+        labels_to_remove        - list of int, a list of labels to be removed
+        inplace                 - boolean, if true, record_dictionary will be modified
+                                  and no return value
+
+    Returns:
+        purged_dictionary       - dictionary,
+                                  key: record_name
+                                  values: (record_data, record_labels)
+                                  record_data: (n, w, m) numpy array
+                                  record_labels: (w,) numpy array
+    """
+
+    if not inplace:
+        purged_dictionary = {}
+
+    labels_to_remove_set = set(labels_to_remove)
+
+    for key in record_dictionary:
+
+        data, labels = record_dictionary[key]
+
+        # leading
+        for leading_idx in range(labels.shape[0]):
+            if labels[leading_idx] not in labels_to_remove_set:
+                break
+        # trailing
+        for trailing_idx  in reversed(range(labels.shape[0])):
+            if labels[trailing_idx] not in labels_to_remove_set:
+                break
+
+        extracted_data = data[:, leading_idx:trailing_idx+1, :]
+        extracted_labels = labels[leading_idx:trailing_idx+1]
+
+        if inplace:
+            record_dictionary[key] = (extracted_data, extracted_labels)
+        else:
+            purged_dictionary[key] = (extracted_data, extracted_labels)
+
+    if not inplace:
+        return purged_dictionary
+
+
+
+def remove_labels(record_dictionary, labels_to_remove, inplace=True):
     """Remove the labels that are listed
 
     Parameters:
@@ -34,6 +86,8 @@ def remove_labels(record_dictionary, labels_to_remove=[5], inplace=True):
                                   record_data: (n, w, m) numpy array
                                   record_labels: (w,) numpy array
         labels_to_remove        - list of int, a list of labels to be removed
+        inplace                 - boolean, if true, record_dictionary will be modified
+                                  and no return value
 
     Returns:
         purged_dictionary       - dictionary,
