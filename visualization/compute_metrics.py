@@ -81,36 +81,36 @@ def compute_scores(labels,
         print("{:<10}: {}".format("precision", scores["precision"]))
         print("{:<10}: {}".format("recall", scores["recall"]))
 
-    if average == None:
+        if average == None:
 
-        matrix = np.stack(
-            [scores["f1"], scores["precision"], scores["recall"]])
+            matrix = np.stack(
+                [scores["f1"], scores["precision"], scores["recall"]])
 
-        plt.imshow(matrix, interpolation='nearest', cmap=plt.cm.Blues)
-        plt.title(title)
-        plt.colorbar()
+            plt.imshow(matrix, interpolation='nearest', cmap=plt.cm.Blues)
+            plt.title(title)
+            plt.colorbar()
 
-        x_tick_marks = np.arange(len(classes))
-        y_tick_marks = np.arange(3)
+            x_tick_marks = np.arange(len(classes))
+            y_tick_marks = np.arange(3)
 
-        plt.xticks(x_tick_marks, classes, rotation=45)
-        plt.yticks(y_tick_marks, ["f1", "precision", "recall"])
+            plt.xticks(x_tick_marks, classes, rotation=45)
+            plt.yticks(y_tick_marks, ["f1", "precision", "recall"])
 
-        fmt = '.2f'
-        thresh = matrix.max() / 2.
-        for i, j in itertools.product(
-                range(matrix.shape[0]), range(matrix.shape[1])):
-            plt.text(
-                j,
-                i,
-                format(matrix[i, j], fmt),
-                horizontalalignment="center",
-                color="white" if matrix[i, j] > thresh else "black")
+            fmt = '.2f'
+            thresh = matrix.max() / 2.
+            for i, j in itertools.product(
+                    range(matrix.shape[0]), range(matrix.shape[1])):
+                plt.text(
+                    j,
+                    i,
+                    format(matrix[i, j], fmt),
+                    horizontalalignment="center",
+                    color="white" if matrix[i, j] > thresh else "black")
 
-        plt.tight_layout()
-        plt.ylabel('Metrics')
-        plt.xlabel('Sleep stages')
+            plt.tight_layout()
+            plt.ylabel('Metrics')
+            plt.xlabel('Sleep stages')
 
-        plt.show()
+            plt.show()
 
     return scores

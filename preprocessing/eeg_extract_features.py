@@ -97,6 +97,7 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
                 pyeeg.permutation_entropy(signal, permutation_order,
                                           embedding_lag))
 
+        # the following features are from "On the classification of sleep states by means of statistical and spectral features from single channel Electroencephalogram" (Hassan et al., 2015)
         elif feature_name == "mean":
             features.append(np.mean(signal))
 
@@ -118,6 +119,16 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
             features.append(
                 np.average(signal_amplitude_spectrum_30Hz) /
                 np.sum(signal_amplitude_spectrum_30Hz))
+
+        elif feature_name == "spectral_spread":
+            spectral_centroid = np.average(signal_amplitude_spectrum_30Hz) / np.sum(signal_amplitude_spectrum_30Hz)
+            features.append(np.sum(np.multiply(np.square(np.arange(signal_amplitude_spectrum_30Hz.shape[0]) - spectral_centroid), signal_amplitude_spectrum_30Hz)) / np.sum(signal_amplitude_spectrum_30Hz))
+
+        elif feature_name == "spectral_decrease":
+            diff = np.diff(signal_amplitude_spectrum_30Hz)
+            m = signal_amplitude_spectrum_30Hz.shape[0]
+            features.append(np.sum(np.divide(diff, np.arange(1, m))) / np.sum(signal_amplitude_spectrum_30Hz))
+
 
         else:
             print("Unknown feature: {}".format(feature_name))
