@@ -1,6 +1,9 @@
 import itertools
 import numpy as np
+import seaborn as sns
+import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
@@ -48,6 +51,23 @@ def plot_confusion_matrix(cm,
     plt.xlabel('Predicted label')
     plt.show()
 
+def metric_barplot(title, metric_name, results_dictionary):
+
+    data = []
+
+    keys = list(results_dictionary.keys())
+
+    for key in keys:
+        data.append(results_dictionary[key][metric_name])
+
+    data = np.stack(data)
+
+    data_frame = pd.DataFrame(data=np.transpose(data), columns=pd.Series(keys))
+
+    sns.barplot(data=data_frame, capsize=.2)
+
+    plt.title(title)
+    plt.xticks(np.arange(len(keys)), keys, rotation=45)
 
 def compute_scores(labels,
                    predictions,
@@ -70,12 +90,14 @@ def compute_scores(labels,
     """
 
     scores = {}
+    scores["kappa"] = cohen_kappa_score(labels, predictions)
     scores["accuracy"] = accuracy_score(labels, predictions)
     scores["f1"] = f1_score(labels, predictions, average=average)
     scores["precision"] = precision_score(labels, predictions, average=average)
     scores["recall"] = recall_score(labels, predictions, average=average)
 
     if verbose:
+        print("{:<10}: {}".format("kappa", scores["kappa"]))
         print("{:<10}: {}".format("accuracy", scores["accuracy"]))
         print("{:<10}: {}".format("f1", scores["f1"]))
         print("{:<10}: {}".format("precision", scores["precision"]))
