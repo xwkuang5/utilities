@@ -4,12 +4,10 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import cohen_kappa_score
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-from sklearn.metrics import roc_auc_score
 
 
 def plot_confusion_matrix(cm,
@@ -51,6 +49,7 @@ def plot_confusion_matrix(cm,
     plt.xlabel('Predicted label')
     plt.show()
 
+
 def metric_barplot(title, metric_name, x_axis_names, data):
     """Plot bar graph with seaborn
 
@@ -62,12 +61,14 @@ def metric_barplot(title, metric_name, x_axis_names, data):
                                     m: number of values for each value on the x-axis
     """
 
-    data_frame = pd.DataFrame(data=np.transpose(data), columns=pd.Series(x_axis_names))
+    data_frame = pd.DataFrame(
+        data=np.transpose(data), columns=pd.Series(x_axis_names))
 
     sns.barplot(data=data_frame, capsize=.2)
 
     plt.title(title)
     plt.xticks(np.arange(len(x_axis_names)), x_axis_names, rotation=45)
+
 
 def compute_scores(labels,
                    predictions,
@@ -77,7 +78,7 @@ def compute_scores(labels,
                    verbose=True):
     """Plot f1, precision, recall in matrix form
 
-    TODO: look into roc_auc_score for multiclass
+    TODO look into roc_auc_score for multiclass
 
     Parameters:
         labels          : (n,) 1-D numpy array, ground truth labels

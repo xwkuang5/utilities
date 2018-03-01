@@ -95,10 +95,11 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
     plt.title(title)
     plt.show()
 
+
 def show_tSNE_plot(data, labels):
     """Show tSNE plot of the data
 
-    TODO: add more tSNE parameters
+    TODO  add more tSNE parameters
 
     Parameters:
         data    : (n, m) numpy array
@@ -107,12 +108,18 @@ def show_tSNE_plot(data, labels):
 
     train_embedded = TSNE(n_components=2).fit_transform(data)
 
-    x_min, x_max = train_embedded[:, 0].min() - .5, train_embedded[:, 0].max() + .5
-    y_min, y_max = train_embedded[:, 1].min() - .5, train_embedded[:, 1].max() + .5
+    x_min, x_max = train_embedded[:, 0].min() - .5, train_embedded[:, 0].max(
+    ) + .5
+    y_min, y_max = train_embedded[:, 1].min() - .5, train_embedded[:, 1].max(
+    ) + .5
 
     # Plot the training points
-    plt.scatter(train_embedded[:, 0], train_embedded[:, 1], c=labels, cmap=plt.cm.Set1,
-                edgecolor='k')
+    plt.scatter(
+        train_embedded[:, 0],
+        train_embedded[:, 1],
+        c=labels,
+        cmap=plt.cm.Set1,
+        edgecolor='k')
 
     plt.xlim(x_min, x_max)
     plt.ylim(y_min, y_max)
@@ -120,12 +127,13 @@ def show_tSNE_plot(data, labels):
     plt.yticks(())
     plt.show()
 
+
 def seaborn_pair_plot(data, features_names, labels, label_mapper=None):
     """Plot pairwise scatter plot with seaborn
 
-    TODO: add feature selection functions
-          users should be able to give a list of index for which he/she
-          would like to visualize.
+    TODO add feature selection functions
+         users should be able to give a list of index for which he/she
+         would like to visualize.
 
     Parameters:
         data            : (n, m) 2-D numpy array

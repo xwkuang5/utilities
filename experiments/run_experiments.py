@@ -20,15 +20,21 @@ from sklearn.tree import DecisionTreeClassifier
 
 import copy
 
+
 def compute_sample_weight(labels, mode="uniform"):
     if mode == "uniform":
         return [1] * labels.shape[0]
     elif mode == "proportional":
         bincount = np.bincount(labels) / labels.shape[0]
-        return np.asarray([bincount[labels[i]] for i in range(labels.shape[0])], dtype=np.float64)
+        return np.asarray(
+            [bincount[labels[i]] for i in range(labels.shape[0])],
+            dtype=np.float64)
     elif mode == "reverse-proportional":
         bincount = labels.shape[0] / np.bincount(labels)
-        return np.asarray([bincount[labels[i]] for i in range(labels.shape[0])], dtype=np.float64)
+        return np.asarray(
+            [bincount[labels[i]] for i in range(labels.shape[0])],
+            dtype=np.float64)
+
 
 def run_classifier(train_data,
                    train_labels,
@@ -63,9 +69,11 @@ def run_classifier(train_data,
         clf = GridSearchCV(copy.deepcopy(classifier), parameters, cv=5)
 
         if name == "GaussianNB":
-            clf.fit(train_data,
-                    train_labels,
-                    sample_weight=compute_sample_weight(train_labels, "proportional"))
+            clf.fit(
+                train_data,
+                train_labels,
+                sample_weight=compute_sample_weight(train_labels,
+                                                    "proportional"))
         else:
             clf.fit(train_data, train_labels)
 
@@ -74,8 +82,10 @@ def run_classifier(train_data,
         kappas.append(cohen_kappa_score(test_labels, test_predictions))
         accuracies.append(accuracy_score(test_labels, test_predictions))
         f1s.append(f1_score(test_labels, test_predictions, average="weighted"))
-        precisions.append(precision_score(test_labels, test_predictions, average="weighted"))
-        recalls.append(recall_score(test_labels, test_predictions, average="weighted"))
+        precisions.append(
+            precision_score(test_labels, test_predictions, average="weighted"))
+        recalls.append(
+            recall_score(test_labels, test_predictions, average="weighted"))
 
         classifiers.append(clf)
 
@@ -85,13 +95,16 @@ def run_classifier(train_data,
 
     test_predict_labels = best_clf.predict(test_data)
 
-    return {"kappa": kappas,
-            "accuracy": accuracies,
-            "precision": precisions,
-            "recall": recalls,
-            "f1": f1s,
-            "clf": best_clf,
-            "predictions": test_predict_labels}
+    return {
+        "kappa": kappas,
+        "accuracy": accuracies,
+        "precision": precisions,
+        "recall": recalls,
+        "f1": f1s,
+        "clf": best_clf,
+        "predictions": test_predict_labels
+    }
+
 
 def run_experiments(input_dir,
                     n_runs,
@@ -117,7 +130,8 @@ def run_experiments(input_dir,
     train_record_info = "/".join([input_dir, "train_eeg_record_info"])
 
     balanced_train_data_dir = "/".join([input_dir, "balanced_train_eeg_data"])
-    balanced_train_labels_dir = "/".join([input_dir, "balanced_train_eeg_labels"])
+    balanced_train_labels_dir = "/".join(
+        [input_dir, "balanced_train_eeg_labels"])
 
     test_data_dir = "/".join([input_dir, "test_eeg_data"])
     test_labels_dir = "/".join([input_dir, "test_eeg_labels"])
@@ -132,7 +146,8 @@ def run_experiments(input_dir,
 
     if balanced:
         balanced_train_data = np.loadtxt(balanced_train_data_dir)
-        balanced_train_labels = np.loadtxt(balanced_train_labels_dir, dtype=np.uint8)
+        balanced_train_labels = np.loadtxt(
+            balanced_train_labels_dir, dtype=np.uint8)
 
     test_data = np.loadtxt(test_data_dir)
     test_labels = np.loadtxt(test_labels_dir, dtype=np.uint8)
@@ -149,15 +164,20 @@ def run_experiments(input_dir,
     for idx, clf in enumerate(classifiers):
 
         if balanced:
-            results_dictionary[names[idx]] = run_classifier(balanced_train_data, balanced_train_labels, test_data, test_labels, names[idx], clf, parameters[idx], n_runs)
+            results_dictionary[names[idx]] = run_classifier(
+                balanced_train_data, balanced_train_labels, test_data,
+                test_labels, names[idx], clf, parameters[idx], n_runs)
         else:
-            results_dictionary[names[idx]] = run_classifier(train_data, train_labels, test_data, test_labels, names[idx], clf, parameters[idx], n_runs)
+            results_dictionary[names[idx]] = run_classifier(
+                train_data, train_labels, test_data, test_labels, names[idx],
+                clf, parameters[idx], n_runs)
 
     with open("/".join([output_dir, "results_dictionary"]), "wb") as f:
         pickle.dump(results_dictionary, f)
     f.close()
 
     return results_dictionary
+
 
 def main():
 
@@ -169,36 +189,47 @@ def main():
 
     args = vars(ap.parse_args())
 
-    classifiers = [GaussianNB(),
-                   KNeighborsClassifier(),
-                   svm.SVC(max_iter=1000),
-                   LogisticRegression(solver="lbfgs"),
-                   MLPClassifier(),
-                   RandomForestClassifier(),
-                   GradientBoostingClassifier(),
-                   DecisionTreeClassifier()]
+    classifiers = [
+        GaussianNB(),
+        KNeighborsClassifier(),
+        svm.SVC(max_iter=1000),
+        LogisticRegression(solver="lbfgs"),
+        MLPClassifier(),
+        RandomForestClassifier(),
+        GradientBoostingClassifier(),
+        DecisionTreeClassifier()
+    ]
 
-    names = ["GaussianNB",
-             "KNearestNeighbor",
-             "SupportVectorMachine",
-             "LogisticRegression",
-             "Perceptron",
-             "RandomForest",
-             "GradientBoosting",
-             "DecisionTree"]
+    names = [
+        "GaussianNB", "KNearestNeighbor", "SupportVectorMachine",
+        "LogisticRegression", "Perceptron", "RandomForest", "GradientBoosting",
+        "DecisionTree"
+    ]
 
-    parameters = [
-                  {},
-                  {"n_neighbors": [5, 10, 30, 50], "weights": ["uniform", "distance"]},
-                  {"kernel": ["linear", "rbf", "poly"], "class_weight": ["balanced", None]},
-                  {"multi_class": ["ovr", "multinomial"], "class_weight": ["balanced", None]},
-                  {"hidden_layer_sizes": [50, 100, 200]},
-                  {"criterion": ["gini", "entropy"], "class_weight": ["balanced", None]},
-                  {"max_depth": [3, 4, 5]},
-                  {"criterion": ["gini", "entropy"], "class_weight": ["balanced", None]}
-                 ]
+    parameters = [{}, {
+        "n_neighbors": [5, 10, 30, 50],
+        "weights": ["uniform", "distance"]
+    }, {
+        "kernel": ["linear", "rbf", "poly"],
+        "class_weight": ["balanced", None]
+    }, {
+        "multi_class": ["ovr", "multinomial"],
+        "class_weight": ["balanced", None]
+    }, {
+        "hidden_layer_sizes": [50, 100, 200]
+    }, {
+        "criterion": ["gini", "entropy"],
+        "class_weight": ["balanced", None]
+    }, {
+        "max_depth": [3, 4, 5]
+    }, {
+        "criterion": ["gini", "entropy"],
+        "class_weight": ["balanced", None]
+    }]
 
-    _ = run_experiments(args["input_dir"], int(args["num_runs"]), names, classifiers, parameters, args["output_dir"])
+    _ = run_experiments(args["input_dir"], int(args["num_runs"]), names,
+                        classifiers, parameters, args["output_dir"])
+
 
 if __name__ == "__main__":
     main()

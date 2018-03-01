@@ -34,7 +34,7 @@ def parse_wfdb_description(desc_filename):
                 return matches
             f.close()
         except:
-            # TODO: handle exception
+            # handle exception
             raise
 
 
@@ -68,7 +68,7 @@ def parse_edf_with_mne(input_edf, desc_filename, channels, scale=1):
                 parsed_data.append(scale * mne.io.read_raw_edf(
                     input_edf, preload=True)[channel_idx][0][0])
             except:
-                # TODO: handle exception
+                # handle exception
                 raise
 
     return np.stack(parsed_data)
