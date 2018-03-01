@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
 
 colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'black']
 
@@ -11,7 +12,7 @@ def vis_sleep_stages_distribution(records,
                                   label_mapper,
                                   sleep_stages=['W', '1', '2', '3', 'R', '?'],
                                   title="sleep stages distribution"):
-    """Visualize sleep stages distribution with bar graph
+    """Visualize sleep stages distribution from list of records with bar graph
 
     Parameters:
         records                 - list of records for visualization,
@@ -74,7 +75,7 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
                                                   2: '2', \
                                                   3: '3', \
                                                   4: 'R'}):
-    """Visualize sleep stages distribution with bar graph
+    """Visualize sleep stages distribution from labels with bar graph
 
     Parameters:
         labels          - 1-D numpy array of int
@@ -94,8 +95,32 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
     plt.title(title)
     plt.show()
 
+def show_tSNE_plot(data, labels):
+    """Show tSNE plot of the data
 
-def seaborn_pair_plot(data, features_names, labels, label_mapper):
+    TODO: add more tSNE parameters
+
+    Parameters:
+        data    : (n, m) numpy array
+        labels  : (n,) numpy array
+    """
+
+    train_embedded = TSNE(n_components=2).fit_transform(data)
+
+    x_min, x_max = train_embedded[:, 0].min() - .5, train_embedded[:, 0].max() + .5
+    y_min, y_max = train_embedded[:, 1].min() - .5, train_embedded[:, 1].max() + .5
+
+    # Plot the training points
+    plt.scatter(train_embedded[:, 0], train_embedded[:, 1], c=labels, cmap=plt.cm.Set1,
+                edgecolor='k')
+
+    plt.xlim(x_min, x_max)
+    plt.ylim(y_min, y_max)
+    plt.xticks(())
+    plt.yticks(())
+    plt.show()
+
+def seaborn_pair_plot(data, features_names, labels, label_mapper=None):
     """Plot pairwise scatter plot with seaborn
 
     TODO: add feature selection functions
@@ -109,7 +134,10 @@ def seaborn_pair_plot(data, features_names, labels, label_mapper):
         label_mapper    : dictionary, mapping label in labels to class
     """
 
-    labels_names = [label_mapper[label] for label in labels]
+    if label_mapper:
+        labels_names = [label_mapper[label] for label in labels]
+    else:
+        labels_names = labels[:]
 
     data_frame = pd.DataFrame(
         data, index=np.arange(data.shape[0]), columns=features_names)
@@ -117,6 +145,6 @@ def seaborn_pair_plot(data, features_names, labels, label_mapper):
 
     sns.set(style="ticks", color_codes=True)
 
-    plot = sns.pairplot(data_frame, hue="label")
+    _ = sns.pairplot(data_frame, hue="label")
 
     plt.show()

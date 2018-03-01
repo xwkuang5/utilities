@@ -1,15 +1,11 @@
 import os
 import pickle
 import argparse
-import itertools
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-from sklearn.metrics import roc_auc_score
 from sklearn.metrics import cohen_kappa_score
 from sklearn.model_selection import GridSearchCV
 
@@ -17,7 +13,6 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import svm
 from sklearn.linear_model import LogisticRegression
-from sklearn.kernel_ridge import KernelRidge
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
@@ -43,6 +38,18 @@ def run_classifier(train_data,
                    classifier,
                    parameters,
                    num_runs=5):
+    """Run a classifier multiple times
+
+    Parameters:
+        train_data      : (n, m) numpy array
+        train_labels    : (n,) numpy array
+        test_data       : (n, m) numpy array
+        test_labels     : (n,) numpy array
+        name            : string, name of the classifier
+        classifier      : classifer implementing the fit and predict method
+        parameters      : list key-value pairs, parameters to be used for grid search
+        n_runs          : int, number of runs to repeat for a classifer
+    """
 
     classifiers = []
     kappas = []
@@ -79,11 +86,11 @@ def run_classifier(train_data,
     test_predict_labels = best_clf.predict(test_data)
 
     return {"kappa": kappas,
-            "accuracy": accuracies, 
-            "precision": precisions, 
-            "recall": recalls, 
-            "f1": f1s, 
-            "clf": best_clf, 
+            "accuracy": accuracies,
+            "precision": precisions,
+            "recall": recalls,
+            "f1": f1s,
+            "clf": best_clf,
             "predictions": test_predict_labels}
 
 def run_experiments(input_dir,
@@ -91,7 +98,19 @@ def run_experiments(input_dir,
                     names,
                     classifiers,
                     parameters,
-                    output_dir):
+                    output_dir,
+                    balanced=False):
+    """
+    Parameters:
+        input_dir       : string, /path/to/input/directory
+        n_runs          : int, number of runs to repeat for a classifer
+        names           : list of string, names of the classifiers
+        classifiers     : list of classifer implementing the fit and predict method
+        parameters      : dictionary, key: classifier name
+                                      value: list key-value pairs, parameters to be used for grid search
+        output_dir      : string, /path/to/output/directory
+        balanced        : boolean, whether to use balanced training dataset
+    """
 
     train_data_dir = "/".join([input_dir, "train_eeg_data"])
     train_labels_dir = "/".join([input_dir, "train_eeg_labels"])
@@ -111,8 +130,9 @@ def run_experiments(input_dir,
         (train_records, train_records_sep) = pickle.load(f)
     f.close()
 
-    balanced_train_data = np.loadtxt(balanced_train_data_dir)
-    balanced_train_labels = np.loadtxt(balanced_train_labels_dir, dtype=np.uint8)
+    if balanced:
+        balanced_train_data = np.loadtxt(balanced_train_data_dir)
+        balanced_train_labels = np.loadtxt(balanced_train_labels_dir, dtype=np.uint8)
 
     test_data = np.loadtxt(test_data_dir)
     test_labels = np.loadtxt(test_labels_dir, dtype=np.uint8)
@@ -128,7 +148,10 @@ def run_experiments(input_dir,
 
     for idx, clf in enumerate(classifiers):
 
-        results_dictionary[names[idx]] = run_classifier(train_data, train_labels, test_data, test_labels, names[idx], clf, parameters[idx], n_runs)
+        if balanced:
+            results_dictionary[names[idx]] = run_classifier(balanced_train_data, balanced_train_labels, test_data, test_labels, names[idx], clf, parameters[idx], n_runs)
+        else:
+            results_dictionary[names[idx]] = run_classifier(train_data, train_labels, test_data, test_labels, names[idx], clf, parameters[idx], n_runs)
 
     with open("/".join([output_dir, "results_dictionary"]), "wb") as f:
         pickle.dump(results_dictionary, f)
@@ -146,26 +169,26 @@ def main():
 
     args = vars(ap.parse_args())
 
-    classifiers = [GaussianNB(), 
-                   KNeighborsClassifier(), 
-                   svm.SVC(max_iter=1000), 
+    classifiers = [GaussianNB(),
+                   KNeighborsClassifier(),
+                   svm.SVC(max_iter=1000),
                    LogisticRegression(solver="lbfgs"),
-                   MLPClassifier(), 
+                   MLPClassifier(),
                    RandomForestClassifier(),
                    GradientBoostingClassifier(),
                    DecisionTreeClassifier()]
 
-    names = ["GaussianNB", 
-             "KNearestNeighbor", 
-             "SupportVectorMachine", 
-             "LogisticRegression", 
-             "Perceptron", 
-             "RandomForest", 
-             "GradientBoosting", 
+    names = ["GaussianNB",
+             "KNearestNeighbor",
+             "SupportVectorMachine",
+             "LogisticRegression",
+             "Perceptron",
+             "RandomForest",
+             "GradientBoosting",
              "DecisionTree"]
 
     parameters = [
-                  {}, 
+                  {},
                   {"n_neighbors": [5, 10, 30, 50], "weights": ["uniform", "distance"]},
                   {"kernel": ["linear", "rbf", "poly"], "class_weight": ["balanced", None]},
                   {"multi_class": ["ovr", "multinomial"], "class_weight": ["balanced", None]},

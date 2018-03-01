@@ -51,23 +51,23 @@ def plot_confusion_matrix(cm,
     plt.xlabel('Predicted label')
     plt.show()
 
-def metric_barplot(title, metric_name, results_dictionary):
+def metric_barplot(title, metric_name, x_axis_names, data):
+    """Plot bar graph with seaborn
 
-    data = []
+    Parameters:
+        title       : string, title of the plot
+        metric_name : string, name of the metric
+        x_axis_names: list of strings, values of the x-axis
+        data        : (n, m) array, n: number of values on the axis
+                                    m: number of values for each value on the x-axis
+    """
 
-    keys = list(results_dictionary.keys())
-
-    for key in keys:
-        data.append(results_dictionary[key][metric_name])
-
-    data = np.stack(data)
-
-    data_frame = pd.DataFrame(data=np.transpose(data), columns=pd.Series(keys))
+    data_frame = pd.DataFrame(data=np.transpose(data), columns=pd.Series(x_axis_names))
 
     sns.barplot(data=data_frame, capsize=.2)
 
     plt.title(title)
-    plt.xticks(np.arange(len(keys)), keys, rotation=45)
+    plt.xticks(np.arange(len(x_axis_names)), x_axis_names, rotation=45)
 
 def compute_scores(labels,
                    predictions,
