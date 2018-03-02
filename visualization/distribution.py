@@ -3,8 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
-
-colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'black']
+from sklearn.decomposition import PCA
 
 
 def vis_sleep_stages_distribution(records,
@@ -18,7 +17,8 @@ def vis_sleep_stages_distribution(records,
         records                 - list of records for visualization,
                                   e.g., ['0906152-1', '0907051-1']
         filenames_template      - template of the label filename,
-                                  e.g., "/home/x4kuang/sleep_staging/sunnybrooks_datasets/{}.txt"
+                                  e.g., "/home/x4kuang/sleep_staging/
+                                  sunnybrooks_datasets/{}.txt"
         label_mapper            - a dictionary mapping possible sleep
                                   stages to a standardized set of sleep
                                   stages, e.g., '1' -> '1', 'N1' -> '1'
@@ -58,6 +58,7 @@ def vis_sleep_stages_distribution(records,
     sleep_stages_info_normed_mean = np.mean(sleep_stages_info_normed, axis=0)
     sleep_stages_info_normed_std = np.std(sleep_stages_info_normed, axis=0)
 
+    colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'black']
     color = colors[len(sleep_stages) % 6]
     ind = np.arange(len(sleep_stages))
     plt.bar(
@@ -70,11 +71,11 @@ def vis_sleep_stages_distribution(records,
     plt.title(title)
     plt.show()
 
-def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
-                                                  1: '1', \
-                                                  2: '2', \
-                                                  3: '3', \
-                                                  4: 'R'}):
+def vis_sleep_stage(labels, title, label_mapper={0: 'W',
+                                                 1: '1',
+                                                 2: '2',
+                                                 3: '3',
+                                                 4: 'R'}):
     """Visualize sleep stages distribution from labels with bar graph
 
     Parameters:
@@ -95,6 +96,26 @@ def vis_sleep_stage(labels, title, label_mapper={0: 'W', \
     plt.title(title)
     plt.show()
 
+
+def show_PCA_plot(data, labels, label_mapper=None):
+
+    data_centered = data - np.mean(data, axis=0, keepdims=True)
+    embedded = PCA(n_components=2).fit_transform(data_centered)
+
+    x_min, x_max = embedded[:, 0].min() - .5, embedded[:, 0].max() + .5
+    y_min, y_max = embedded[:, 1].min() - .5, embedded[:, 1].max() + .5
+
+    # Plot the training points
+    plt.scatter(embedded[:, 0], embedded[:, 1], c=labels, cmap=plt.cm.Set1,
+                edgecolor='k')
+
+    plt.xlim(x_min, x_max)
+    plt.ylim(y_min, y_max)
+    plt.xticks(())
+    plt.yticks(())
+    plt.show()
+
+    seaborn_pair_plot(embedded, np.arange(2), labels, label_mapper)
 
 def show_tSNE_plot(data, labels):
     """Show tSNE plot of the data
