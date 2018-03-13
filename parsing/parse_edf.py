@@ -2,6 +2,7 @@ import os
 import re
 import glob
 import pickle
+import joblib
 import operator
 import argparse
 import subprocess
@@ -156,7 +157,7 @@ def save_record_dictionary(record_dictionary, output_filename):
     """
 
     with open(output_filename, "wb") as f:
-        pickle.dump(record_dictionary, f)
+        joblib.dump(record_dictionary, f)
     f.close()
 
 
