@@ -71,11 +71,16 @@ def vis_sleep_stages_distribution(records,
     plt.title(title)
     plt.show()
 
-def vis_sleep_stage(labels, title, label_mapper={0: 'W',
-                                                 1: '1',
-                                                 2: '2',
-                                                 3: '3',
-                                                 4: 'R'}):
+
+def vis_sleep_stage(labels,
+                    title,
+                    label_mapper={
+                        0: 'W',
+                        1: '1',
+                        2: '2',
+                        3: '3',
+                        4: 'R'
+                    }):
     """Visualize sleep stages distribution from labels with bar graph
 
     Parameters:
@@ -106,8 +111,12 @@ def show_PCA_plot(data, labels, label_mapper=None):
     y_min, y_max = embedded[:, 1].min() - .5, embedded[:, 1].max() + .5
 
     # Plot the training points
-    plt.scatter(embedded[:, 0], embedded[:, 1], c=labels, cmap=plt.cm.Set1,
-                edgecolor='k')
+    plt.scatter(
+        embedded[:, 0],
+        embedded[:, 1],
+        c=labels,
+        cmap=plt.cm.Set1,
+        edgecolor='k')
 
     plt.xlim(x_min, x_max)
     plt.ylim(y_min, y_max)
@@ -116,6 +125,7 @@ def show_PCA_plot(data, labels, label_mapper=None):
     plt.show()
 
     seaborn_pair_plot(embedded, np.arange(2), labels, label_mapper)
+
 
 def show_tSNE_plot(data, labels):
     """Show tSNE plot of the data
