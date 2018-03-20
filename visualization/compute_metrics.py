@@ -75,7 +75,8 @@ def compute_scores(labels,
                    average=None,
                    classes=None,
                    title="Metrics",
-                   verbose=True):
+                   verbose=True,
+                   plot=True):
     """Plot f1, precision, recall in matrix form
 
     TODO look into roc_auc_score for multiclass
@@ -88,6 +89,8 @@ def compute_scores(labels,
         title           : string, title of the plot
         verbose         : boolean, if true, print accuracy, f1,
                           precision, recall score
+        plot            : boolean, if true, plot confusion-matrix-like
+                          table
     """
 
     scores = {}
@@ -134,6 +137,7 @@ def compute_scores(labels,
             plt.ylabel('Metrics')
             plt.xlabel('Sleep stages')
 
-            plt.show()
+            if plot:
+                plt.show()
 
     return scores
