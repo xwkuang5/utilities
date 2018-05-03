@@ -1,7 +1,6 @@
 import os
 import re
 import glob
-import pickle
 import joblib
 import operator
 import argparse
@@ -30,10 +29,8 @@ def parse_wfdb_description(desc_filename):
             with open(desc_filename, "r") as f:
                 regex = r".*Description: (.*)$"
                 content = f.read()
-                matches = re.findall(regex, content, \
-                        flags=re.MULTILINE)
+                matches = re.findall(regex, content, flags=re.MULTILINE)
                 return matches
-            f.close()
         except:
             # handle exception
             raise
@@ -74,23 +71,30 @@ def parse_edf_with_mne(input_edf, desc_filename, channels, scale=1):
 
     return np.stack(parsed_data)
 
-def parse_records_and_labels(record_names, channels, record_template, label_template, \
-                             record_desc_template, \
-                             label_mapper, \
-                             label_mapper_to_int, \
-                             window_length, \
+
+def parse_records_and_labels(record_names,
+                             channels,
+                             record_template,
+                             label_template,
+                             record_desc_template,
+                             label_mapper,
+                             label_mapper_to_int,
+                             window_length,
                              sampling_frequency,
                              scale=1):
     """Parse all records and labels and return dictionary mapping
     record_name to (record, label) pair
 
-    Note: This function makes the assumption that the head of the recording matches with the head of the hypnogram annotation. In case of mismatch between the ends, the longer one is truncated.
+    Note: This function makes the assumption that the head of the recording
+    matches with the head of the hypnogram annotation. In case of mismatch
+    between the ends, the longer one is truncated.
 
     Parameters:
         record_names        - list of strings, a list of record names
         channels            - list of strings, a list of channels
         record_template     - string, a string template for record (.edf)
-        record_desc_template- string, a string template for record description (.desc)
+        record_desc_template- string, a string template for record
+                              description (.desc)
         label_template      - string, a string template for labels (.txt)
         label_mapper        - dictionary, mapping possible sleep stages to a
                               set of standardized sleep stages
@@ -98,7 +102,8 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
                               sleep stages to integer
         window_length       - int, length of the window used in annotation
         sampling_frequency  - int, sampling frequency of the recording
-        scale               - int, scaling factor applied on the raw data values
+        scale               - int, scaling factor applied on the raw data
+                              values
 
 
     Returns:
@@ -158,7 +163,6 @@ def save_record_dictionary(record_dictionary, output_filename):
 
     with open(output_filename, "wb") as f:
         joblib.dump(record_dictionary, f)
-    f.close()
 
 
 def parse_edf_with_rdsamp(input_edf, desc_filename, channels):
@@ -232,7 +236,7 @@ def parse_csv_records_and_labels(record_names,
             record_edf_filename, skiprows=2, delimiter=",", usecols=1)
         record_labels = np.genfromtxt(record_labels_filename, dtype="str")
 
-        if label_mapper != None:
+        if label_mapper is not None:
             record_labels = [label_mapper[label] for label in record_labels]
 
         record_dictionary[record_name] = (record_edf, record_labels)

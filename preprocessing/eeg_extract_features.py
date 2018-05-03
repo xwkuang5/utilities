@@ -4,13 +4,20 @@ import math
 import pyeeg
 import scipy.stats
 
-def extract_features(signal, fs=256, feature_dict={"PS": 30, \
-                                                   "PR": [0.5, 4, 7, 13, 30], \
-                                                   "hjorth_fractal_dimension": 3, \
-                                                   "hjorth": None}):
+
+def extract_features(
+        signal,
+        fs=256,
+        feature_dict={
+            "PS": 30,
+            "PR": [0.5, 4, 7, 13, 30],
+            "hjorth_fractal_dimension": 3,
+            "hjorth": None
+        }):
     """Extract eeg features for a bulk of signals
 
-    The default values are never used because they must be passed from the users.
+    The default values are never used because they must be passed from the
+    users.
 
     Parameters:
         signals         - (w, m) 2-D numpy array of float, where w corresponds
@@ -96,9 +103,12 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
             features.append(
                 pyeeg.permutation_entropy(signal, permutation_order,
                                           embedding_lag))
-
-        # the following features are from "On the classification of sleep states by means of statistical and spectral features from single channel Electroencephalogram" (Hassan et al., 2015)
         elif feature_name == "mean":
+            """
+            the following features are from On the classification of sleep states
+            by means of statistical and spectral features from single channel
+            Electroencephalogram (Hassan et al., 2015)
+            """
             features.append(np.mean(signal))
 
         elif feature_name == "variance":

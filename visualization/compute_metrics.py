@@ -68,6 +68,7 @@ def metric_barplot(title, metric_name, x_axis_names, data):
 
     plt.title(title)
     plt.xticks(np.arange(len(x_axis_names)), x_axis_names, rotation=45)
+    plt.show()
 
 
 def compute_scores(labels,
@@ -107,7 +108,7 @@ def compute_scores(labels,
         print("{:<10}: {}".format("precision", scores["precision"]))
         print("{:<10}: {}".format("recall", scores["recall"]))
 
-        if average == None:
+        if average is None:
 
             matrix = np.stack(
                 [scores["f1"], scores["precision"], scores["recall"]])
