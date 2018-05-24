@@ -187,3 +187,23 @@ def seaborn_pair_plot(data, features_names, labels, label_mapper=None):
     _ = sns.pairplot(data_frame, hue="label")
 
     plt.show()
+
+def seaborn_dist_plot(data, features_names):
+    """Plot the distribution of the variables
+
+    Parameters:
+        data            : (n, m) 2-D numpy array
+        features_names  : list, or (n,) 1-D array like of string
+    """
+
+    fig, axs = plt.subplots(ncols=len(features_names))
+
+    for i in range(len(features_names)):
+        sns.distplot(data[:, i], fit=norm, ax=axs[i])
+        axs[i].set_title(features_names[i])
+     
+    fig.set_figwidth(10*len(features_names))
+    fig.set_figheight(20)
+
+    plt.tight_layout()
+    plt.show()
