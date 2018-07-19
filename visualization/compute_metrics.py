@@ -68,6 +68,7 @@ def metric_barplot(title, metric_name, x_axis_names, data):
 
     plt.title(title)
     plt.xticks(np.arange(len(x_axis_names)), x_axis_names, rotation=45)
+    plt.show()
 
 
 def compute_scores(labels,
@@ -75,7 +76,8 @@ def compute_scores(labels,
                    average=None,
                    classes=None,
                    title="Metrics",
-                   verbose=True):
+                   verbose=True,
+                   plot=True):
     """Plot f1, precision, recall in matrix form
 
     TODO look into roc_auc_score for multiclass
@@ -88,6 +90,8 @@ def compute_scores(labels,
         title           : string, title of the plot
         verbose         : boolean, if true, print accuracy, f1,
                           precision, recall score
+        plot            : boolean, if true, plot confusion-matrix-like
+                          table
     """
 
     scores = {}
@@ -104,7 +108,7 @@ def compute_scores(labels,
         print("{:<10}: {}".format("precision", scores["precision"]))
         print("{:<10}: {}".format("recall", scores["recall"]))
 
-        if average == None:
+        if average is None:
 
             matrix = np.stack(
                 [scores["f1"], scores["precision"], scores["recall"]])
@@ -134,6 +138,7 @@ def compute_scores(labels,
             plt.ylabel('Metrics')
             plt.xlabel('Sleep stages')
 
-            plt.show()
+            if plot:
+                plt.show()
 
     return scores

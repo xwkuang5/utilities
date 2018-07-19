@@ -66,7 +66,3 @@ def parse_hyp_txt_from_rdann(filename, window_length):
     ]
 
     return unfolded_sleep_stages
-
-
-parse_hypnogram("/home/x4kuang/sleep_staging/sleep_edf_datasets", "csv", "txt",
-                30)
