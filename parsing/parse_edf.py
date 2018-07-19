@@ -1,15 +1,14 @@
 import os
 import re
 import glob
-import pickle
 import joblib
 import operator
 import argparse
 import subprocess
-
 import numpy as np
 
 import mne
+
 # suppress warning
 mne.set_log_level(verbose=False)
 
@@ -84,7 +83,8 @@ def parse_records_and_labels(record_names, channels, record_template, label_temp
     """Parse all records and labels and return dictionary mapping
     record_name to (record, label) pair
 
-    Note: This function makes the assumption that the head of the recording matches with the head of the hypnogram annotation. In case of mismatch between the ends, the longer one is truncated.
+    Note: This function makes the assumption that the head of the recording matches with the head of the hypnogram
+    annotation. In case of mismatch between the ends, the longer one is truncated.
 
     Parameters:
         record_names        - list of strings, a list of record names
