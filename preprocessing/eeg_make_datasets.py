@@ -1,5 +1,5 @@
 import os
-import pickle
+import joblib
 import numpy as np
 
 from .eeg_extract_features import extract_features
@@ -176,6 +176,7 @@ def create_eeg_features_dataset(record_dictionary, channel, channels,
 
     data = []
     labels = []
+    ids_in_record = []
     sorted_record_sep = []
 
     for key in sorted_records:
@@ -186,6 +187,7 @@ def create_eeg_features_dataset(record_dictionary, channel, channels,
 
         extracted_data = []
         extracted_labels = []
+        extracted_ids_in_record = []
 
         for i in range(record_data_single_channel.shape[0]):
             features = extract_features(record_data_single_channel[i],
@@ -198,17 +200,20 @@ def create_eeg_features_dataset(record_dictionary, channel, channels,
             if np.isnan(features).sum() == 0:
                 extracted_data.append(features)
                 extracted_labels.append(i)
+                extracted_ids_in_record.append((key, i))
 
         extracted_record_labels = record_labels[extracted_labels]
 
         data.append(np.stack(extracted_data))
         labels.append(extracted_record_labels)
+        ids_in_record.append(extracted_ids_in_record)
         sorted_record_sep.append(extracted_record_labels.shape[0])
 
     data = np.concatenate(data)
     labels = np.concatenate(labels)
+    ids_in_record = np.concatenate(ids_in_record)
 
-    return data, labels, sorted_records, sorted_record_sep
+    return data, labels, ids_in_record, sorted_records, sorted_record_sep
 
 
 def save_shapelets_datasets_ucr(output_dir, prefix, data, labels,
@@ -239,11 +244,11 @@ def save_shapelets_datasets_ucr(output_dir, prefix, data, labels,
         ucr_data_template.format(output_dir, prefix), labels, data)
 
     with open(record_info_template.format(output_dir, prefix), "wb") as f:
-        pickle.dump((sorted_records, sorted_record_sep), f)
+        joblib.dump((sorted_records, sorted_record_sep), f)
     f.close()
 
 
-def save_eeg_features_datasets(output_dir, prefix, data, labels,
+def save_eeg_features_datasets(output_dir, prefix, data, labels, ids_in_record,
                                sorted_records, sorted_record_sep):
     """Persist eeg features dataset to hard disk
 
@@ -253,6 +258,7 @@ def save_eeg_features_datasets(output_dir, prefix, data, labels,
                               TRAINING/TESTING
         data                - (n, m) 2-D numpy array of float
         labels              - (n,) 1-D numpy array of integer
+        ids_in_record       - (n, 2) numpy array of pair (string, int)
         sorted_records      - list of string, a list of record names
                               where the order of the elements corresponds
                               to the data
@@ -266,11 +272,16 @@ def save_eeg_features_datasets(output_dir, prefix, data, labels,
 
     data_template = "{}/{}_eeg_data"
     labels_template = "{}/{}_eeg_labels"
+    ids_in_record_template = "{}/{}_eeg_ids_in_record"
     record_info_template = "{}/{}_eeg_record_info"
 
     np.savetxt(data_template.format(output_dir, prefix), data)
     np.savetxt(labels_template.format(output_dir, prefix), labels)
+    np.savetxt(
+        ids_in_record_template.format(output_dir, prefix),
+        ids_in_record,
+        fmt="%s")
 
     with open(record_info_template.format(output_dir, prefix), "wb") as f:
-        pickle.dump((sorted_records, sorted_record_sep), f)
+        joblib.dump((sorted_records, sorted_record_sep), f)
     f.close()

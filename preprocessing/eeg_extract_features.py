@@ -4,13 +4,20 @@ import math
 from .pyeeg import hfd, hjorth, spectral_entropy, svd_entropy, permutation_entropy
 import scipy.stats
 
-def extract_features(signal, fs=256, feature_dict={"PS": 30, \
-                                                   "PR": [0.5, 4, 7, 13, 16, 30], \
-                                                   "hjorth_fractal_dimension": 3, \
-                                                   "hjorth": None}):
+
+def extract_features(
+        signal,
+        fs=256,
+        feature_dict={
+            "PS": 30,
+            "PR": [0.5, 4, 7, 13, 30],
+            "hjorth_fractal_dimension": 3,
+            "hjorth": None
+        }):
     """Extract eeg features for a bulk of signals
 
-    The default values are never used because they must be passed from the users.
+    The default values are never used because they must be passed from the
+    users.
 
     Parameters:
         signals         - (w, m) 2-D numpy array of float, where w corresponds
@@ -96,10 +103,12 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
             features.append(
                 permutation_entropy(signal, permutation_order,
                                           embedding_lag))
-
-        # the following features are from "On the classification of sleep states by means of statistical and spectral
-        # features from single channel Electroencephalogram" (Hassan et al., 2015)
         elif feature_name == "mean":
+            """
+            the following features are from On the classification of sleep states
+            by means of statistical and spectral features from single channel
+            Electroencephalogram (Hassan et al., 2015)
+            """
             features.append(np.mean(signal))
 
         elif feature_name == "variance":
@@ -116,16 +125,19 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
                 scipy.stats.gmean(signal_amplitude_spectrum_30Hz) /
                 np.mean(signal_amplitude_spectrum_30Hz))
 
+        # TODO: should weights be divided by 30Hz?
         elif feature_name == "spectral_centroid":
             features.append(
-                np.average(signal_amplitude_spectrum_30Hz, 
-                           weights=np.arange(signal_amplitude_spectrum_30Hz.shape[0])) /
-                np.sum(signal_amplitude_spectrum_30Hz))
+                np.average(
+                    signal_amplitude_spectrum_30Hz,
+                    weights=np.arange(signal_amplitude_spectrum_30Hz.shape[0]))
+                / np.sum(signal_amplitude_spectrum_30Hz))
 
         elif feature_name == "spectral_spread":
             spectral_centroid = np.average(
-                signal_amplitude_spectrum_30Hz, weights=np.arange(signal_amplitude_spectrum_30Hz.shape[0])) / np.sum(
-                    signal_amplitude_spectrum_30Hz)
+                signal_amplitude_spectrum_30Hz,
+                weights=np.arange(signal_amplitude_spectrum_30Hz.shape[
+                    0])) / np.sum(signal_amplitude_spectrum_30Hz)
             features.append(
                 np.sum(
                     np.multiply(
