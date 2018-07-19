@@ -2,9 +2,9 @@ import os
 import pickle
 import numpy as np
 
-from eeg_extract_features import extract_features
-from classification_formater import write_ucr_data_with_filename
-from transformation import down_sampling
+from .eeg_extract_features import extract_features
+from .classification_formater import write_ucr_data_with_filename
+from .transformation import down_sampling
 
 
 def windowing(parsed_record, labels, sampling_frequency=256, window_length=30):

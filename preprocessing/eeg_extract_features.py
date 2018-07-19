@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-import pyeeg
+from .pyeeg import hfd, hjorth, spectral_entropy, svd_entropy, permutation_entropy
 import scipy.stats
 
 def extract_features(signal, fs=256, feature_dict={"PS": 30, \
@@ -62,10 +62,10 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
 
         elif feature_name == "hjorth_fractal_dimension":
             hfd_param = feature_dict["hjorth_fractal_dimension"]
-            features.append(pyeeg.hfd(signal, hfd_param))
+            features.append(hfd(signal, hfd_param))
 
         elif feature_name == "hjorth":
-            hm, hc = pyeeg.hjorth(signal, signal_first_order_diff)
+            hm, hc = hjorth(signal, signal_first_order_diff)
             features.append(hm)
             features.append(hc)
 
@@ -83,21 +83,22 @@ def extract_features(signal, fs=256, feature_dict={"PS": 30, \
             power_ratio = power / np.sum(power)
 
             features.append(
-                pyeeg.spectral_entropy(signal, band, fs, power_ratio))
+                spectral_entropy(signal, band, fs, power_ratio))
 
         elif feature_name == "svd_entropy":
             embedding_lag, embedding_dimension = feature_dict["svd_entropy"]
             features.append(
-                pyeeg.svd_entropy(signal, embedding_lag, embedding_dimension))
+                svd_entropy(signal, embedding_lag, embedding_dimension))
 
         elif feature_name == "permutation_entropy":
             permutation_order, embedding_lag = feature_dict[
                 "permutation_entropy"]
             features.append(
-                pyeeg.permutation_entropy(signal, permutation_order,
+                permutation_entropy(signal, permutation_order,
                                           embedding_lag))
 
-        # the following features are from "On the classification of sleep states by means of statistical and spectral features from single channel Electroencephalogram" (Hassan et al., 2015)
+        # the following features are from "On the classification of sleep states by means of statistical and spectral
+        # features from single channel Electroencephalogram" (Hassan et al., 2015)
         elif feature_name == "mean":
             features.append(np.mean(signal))
 
