@@ -3,7 +3,7 @@ import joblib
 import numpy as np
 
 from .eeg_extract_features import extract_features
-from .classification_formater import write_ucr_data_with_filename
+from utilities.preprocessing.classification_formater import write_ucr_data_with_filename
 from .transformation import down_sampling
 
 
