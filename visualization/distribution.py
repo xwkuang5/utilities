@@ -50,11 +50,8 @@ def vis_sleep_stages_distribution(records,
     sleep_stages_info = np.asarray(
         np.stack(sleep_stages_info), dtype=np.float64)
 
-    sleep_stages_info_normed = np.divide(sleep_stages_info,
-                                         np.sum(
-                                             sleep_stages_info,
-                                             axis=1,
-                                             keepdims=True))
+    sleep_stages_info_normed = np.divide(
+        sleep_stages_info, np.sum(sleep_stages_info, axis=1, keepdims=True))
     sleep_stages_info_normed_mean = np.mean(sleep_stages_info_normed, axis=0)
     sleep_stages_info_normed_std = np.std(sleep_stages_info_normed, axis=0)
 
@@ -188,6 +185,7 @@ def seaborn_pair_plot(data, features_names, labels, label_mapper=None):
 
     plt.show()
 
+
 def seaborn_dist_plot(data, features_names):
     """Plot the distribution of the variables
 
@@ -201,8 +199,8 @@ def seaborn_dist_plot(data, features_names):
     for i in range(len(features_names)):
         sns.distplot(data[:, i], fit=norm, ax=axs[i])
         axs[i].set_title(features_names[i])
-     
-    fig.set_figwidth(10*len(features_names))
+
+    fig.set_figwidth(10 * len(features_names))
     fig.set_figheight(20)
 
     plt.tight_layout()
