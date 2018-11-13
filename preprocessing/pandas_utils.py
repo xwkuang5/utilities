@@ -19,7 +19,8 @@ def drop_features(df, features_to_remove=[], row_index_included=True):
 
     indices = [feature_names.get_loc(val) for val in features_to_remove]
 
-    features_to_keep = [(idx, val) for idx, val in enumerate(feature_names) if idx not in set(indices)]
+    features_to_keep = [(idx, val) for idx, val in enumerate(feature_names)
+                        if idx not in set(indices)]
 
     data = df[[val for idx, val in features_to_keep]].copy()
 
