@@ -31,10 +31,14 @@ def select_from_datasets(predictions, predictions_proba, config):
         predictions             : (m, ) numpy array
         predictions_proba       : (m, c) numpy array
         config                  : configuration dictionary {
-                                    confidence_range: [[low, high], ...],
-                                    targets: [[('A', 2), ('B', 2)], ...],
-                                    shuffled: true/false
+                                    confidenceRange: [[low, high], ...],
+                                    targets: [[['A', 2], ['B', 2]], ...],
                                   }
+
+    Returns:
+        ret_dict                : result dictionary {
+                                    (c_start, c_end): <indices>,
+                                }
     """
 
     import math
@@ -43,7 +47,9 @@ def select_from_datasets(predictions, predictions_proba, config):
 
     ret_dict = {}
 
-    for c_start, c_end in config['confidence_range']:
+    for confidence_range, targets in zip(config['confidenceRange'], config['targets']):
+
+        c_start, c_end = confidence_range
 
         tmp_list = []
 
@@ -51,20 +57,17 @@ def select_from_datasets(predictions, predictions_proba, config):
         confidence_indices = indices[np.where((inf_norm > c_start) &
                                               (inf_norm <= c_end))]
 
-        for target, cnt in config['targets']:
-
+        for target, count in targets:
             target_indices = indices[np.where(predictions == target)]
 
-            intersection = intersection_of_two_sorted_list(
-                confidence_indices, target_indices)
+            intersection = intersection_of_two_sorted_list(confidence_indices, target_indices)
 
-            if cnt > len(intersection):
+            if count > len(intersection):
                 print(
                     "Warning: required number of targets ({}) is larger than the number of satisfying targets in the dataset ({}), using {} instead".
-                    format(cnt, len(intersection), len(intersection)))
+                        format(count, len(intersection), len(intersection)))
 
-            size = min(cnt, len(intersection))
-            tmp_list.append((target, intersection))
+            tmp_list.append((target, intersection[:count]))
 
         ret_dict[(c_start, c_end)] = tmp_list
 
