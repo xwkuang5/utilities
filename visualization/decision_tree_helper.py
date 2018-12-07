@@ -41,6 +41,38 @@ class TreeNode:
                     ] + [[right_predicate] + branch
                          for branch in right_branches]
 
+    @staticmethod
+    def get_predicate(feature_id, threshold, relation, encoder_helper):
+        """Return a predicate represented by a tree node in the decision tree
+
+        Args:
+            feature_id          : int (feature id of the tree node, note not id of the node)
+            threshold           : float, threshold used by the node to make a branching decision
+            relation            : str, '<=' or '>', indicating left or right branch
+            encoder_helper      : EncoderHelper
+                                  from utilities.preprocessing.encoding import EncodingHelper
+        """
+
+        feature_index, feature_value = encoder_helper.get_feature_name_and_value(feature_id)
+
+        def predicate(row):
+
+            if feature_index in encoder_helper.continuous_features:
+                if relation == '<=':
+                    return float(row[feature_index]) <= threshold
+                else:
+                    return float(row[feature_index]) > threshold
+            else:
+                assert threshold == 0.5, "Threshold for one hot encoded data is {}, not 0.5".format(threshold)
+                assert feature_value is not None, "Feature value is None"
+
+                if relation == '<=':
+                    return row[feature_index] != feature_value
+                else:
+                    return row[feature_index] == feature_value
+
+        return predicate
+
 
 class DecisionTreeHelper:
     def __init__(self, decision_decision_tree_instance):
