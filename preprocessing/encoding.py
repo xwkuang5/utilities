@@ -30,7 +30,7 @@ class EncodingHelper:
         self.sep_index = sep_index
         self.sep_id = sep_id
 
-    def get_feature_name_and_value(self, feature_id):
+    def get_feature_index_and_value(self, feature_id):
         # feature id starts from 0 so bisect_left is fine
         bisect_index = bisect.bisect_left(self.acc, feature_id)
         """
@@ -44,7 +44,7 @@ class EncodingHelper:
         # continuous features
         if feature_id >= self.sep_id:
             feature_index = self.continuous_features[bisect_index - self.sep_index]
-            return self.feature_names[feature_index], None
+            return feature_index, None
         # categorical features
         else:
             feature_index = self.categorical_features[bisect_index]
