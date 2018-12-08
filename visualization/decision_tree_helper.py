@@ -23,7 +23,7 @@ class TreeNode:
 
         Each list of predicate represents a path from the root to the leaf
 
-        Predicate format: (is_leaf, class_name, feature_id, threshold, relation)
+        Predicate format: (is_leaf, class_label, feature_id, threshold, relation)
         """
 
         if root.is_leaf:
@@ -53,10 +53,8 @@ class TreeNode:
                                   from utilities.preprocessing.encoding import EncodingHelper
         """
 
-        feature_index, feature_value = encoder_helper.get_feature_name_and_value(feature_id)
-
         def predicate(row):
-
+            feature_index, feature_value = encoder_helper.get_feature_index_and_value(feature_id)
             if feature_index in encoder_helper.continuous_features:
                 if relation == '<=':
                     return float(row[feature_index]) <= threshold
