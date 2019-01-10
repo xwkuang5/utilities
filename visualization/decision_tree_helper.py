@@ -54,14 +54,16 @@ class TreeNode:
         """
 
         def predicate(row):
-            feature_index, feature_value = encoder_helper.get_feature_index_and_value(feature_id)
+            feature_index, feature_value = encoder_helper.get_feature_index_and_value(
+                feature_id)
             if feature_index in encoder_helper.continuous_features:
                 if relation == '<=':
                     return float(row[feature_index]) <= threshold
                 else:
                     return float(row[feature_index]) > threshold
             else:
-                assert threshold == 0.5, "Threshold for one hot encoded data is {}, not 0.5".format(threshold)
+                assert threshold == 0.5, "Threshold for one hot encoded data is {}, not 0.5".format(
+                    threshold)
                 assert feature_value is not None, "Feature value is None"
 
                 if relation == '<=':

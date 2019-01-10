@@ -48,9 +48,8 @@ def extract_features(
 
         if feature_name == "PS":
             max_freq = feature_dict["PS"]
-            feature = np.sum(
-                signal_power_spectrum[0:math.floor(max_freq / fs *
-                                                   signal_length)])
+            feature = np.sum(signal_power_spectrum[0:math.floor(
+                max_freq / fs * signal_length)])
             features.append(feature)
 
         elif feature_name == "PR":
@@ -61,8 +60,8 @@ def extract_features(
                 freq = float(band[freq_idx])
                 next_freq = float(band[freq_idx + 1])
                 power[freq_idx] = np.sum(signal_power_spectrum[math.floor(
-                    freq / fs * signal_length):math.floor(next_freq / fs *
-                                                          signal_length)])
+                    freq / fs * signal_length):math.floor(
+                        next_freq / fs * signal_length)])
 
             power_ratio = power / np.sum(power)
 
@@ -85,8 +84,8 @@ def extract_features(
                 freq = float(band[freq_idx])
                 next_freq = float(band[freq_idx + 1])
                 power[freq_idx] = np.sum(signal_power_spectrum[math.floor(
-                    freq / fs * signal_length):math.floor(next_freq / fs *
-                                                          signal_length)])
+                    freq / fs * signal_length):math.floor(
+                        next_freq / fs * signal_length)])
 
             power_ratio = power / np.sum(power)
 
@@ -135,8 +134,8 @@ def extract_features(
         elif feature_name == "spectral_spread":
             spectral_centroid = np.average(
                 signal_amplitude_spectrum_30Hz,
-                weights=np.arange(signal_amplitude_spectrum_30Hz.shape[0])
-            ) / np.sum(signal_amplitude_spectrum_30Hz)
+                weights=np.arange(signal_amplitude_spectrum_30Hz.shape[
+                    0])) / np.sum(signal_amplitude_spectrum_30Hz)
             features.append(
                 np.sum(
                     np.multiply(

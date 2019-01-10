@@ -216,9 +216,8 @@ def bin_power(X, Band, Fs):
     for Freq_Index in range(0, len(Band) - 1):
         Freq = float(Band[Freq_Index])
         Next_Freq = float(Band[Freq_Index + 1])
-        Power[Freq_Index] = sum(
-            C[numpy.floor(Freq / Fs * len(X)):numpy.floor(Next_Freq / Fs *
-                                                          len(X))])
+        Power[Freq_Index] = sum(C[numpy.floor(Freq / Fs * len(X)):numpy.floor(
+            Next_Freq / Fs * len(X))])
     Power_Ratio = Power / sum(Power)
     return Power, Power_Ratio
 
@@ -701,9 +700,9 @@ def dfa(X, Ave=None, L=None):
 
     if L is None:
         L = numpy.floor(
-            len(X) * 1 / (2**numpy.array(
-                list(range(4,
-                           int(numpy.log2(len(X))) - 4)))))
+            len(X) * 1 /
+            (2**numpy.array(list(range(4,
+                                       int(numpy.log2(len(X))) - 4)))))
 
     F = numpy.zeros(len(L))  # F(n) of different given box length n
 

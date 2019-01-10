@@ -26,35 +26,35 @@ class TestSelection(unittest.TestCase):
 
     def testSingleTarget(self):
 
-        self.assertEqual(
-            {
-                (0.6, 1): [('B', [3])]
-            },
-            select_from_datasets(TestSelection._predictions,
-                                 TestSelection._predictions_proba, {
-                                     'confidence_range': [[0.6, 1]],
-                                     'targets': [('B', 3)]
-                                 }))
+        self.assertEqual({
+            (0.6, 1): [('B', [3])]
+        },
+                         select_from_datasets(
+                             TestSelection._predictions,
+                             TestSelection._predictions_proba, {
+                                 'confidenceRange': [[0.6, 1]],
+                                 'targets': [[['B', 3]]]
+                             }))
 
-        self.assertEqual(
-            {
-                (0.6, 1): [('A', [0, 1])]
-            },
-            select_from_datasets(TestSelection._predictions,
-                                 TestSelection._predictions_proba, {
-                                     'confidence_range': [[0.6, 1]],
-                                     'targets': [('A', 3)]
-                                 }))
+        self.assertEqual({
+            (0.6, 1): [('A', [0, 1])]
+        },
+                         select_from_datasets(
+                             TestSelection._predictions,
+                             TestSelection._predictions_proba, {
+                                 'confidenceRange': [[0.6, 1]],
+                                 'targets': [[['A', 3]]]
+                             }))
 
-        self.assertEqual(
-            {
-                (0.6, 1): [('C', [6, 7, 8])]
-            },
-            select_from_datasets(TestSelection._predictions,
-                                 TestSelection._predictions_proba, {
-                                     'confidence_range': [[0.6, 1]],
-                                     'targets': [('C', 3)]
-                                 }))
+        self.assertEqual({
+            (0.6, 1): [('C', [6, 7, 8])]
+        },
+                         select_from_datasets(
+                             TestSelection._predictions,
+                             TestSelection._predictions_proba, {
+                                 'confidenceRange': [[0.6, 1]],
+                                 'targets': [[['C', 3]]]
+                             }))
 
     def testTwoTargets(self):
         self.assertEqual({
@@ -63,8 +63,8 @@ class TestSelection(unittest.TestCase):
                          select_from_datasets(
                              TestSelection._predictions,
                              TestSelection._predictions_proba, {
-                                 'confidence_range': [[0.6, 1]],
-                                 'targets': [('A', 2), ('B', 3)]
+                                 'confidenceRange': [[0.6, 1]],
+                                 'targets': [[['A', 2], ['B', 3]]]
                              }))
         self.assertEqual({
             (0.8, 1): [('A', [0]), ('B', [3])]
@@ -72,20 +72,19 @@ class TestSelection(unittest.TestCase):
                          select_from_datasets(
                              TestSelection._predictions,
                              TestSelection._predictions_proba, {
-                                 'confidence_range': [[0.8, 1]],
-                                 'targets': [('A', 2), ('B', 3)]
+                                 'confidenceRange': [[0.8, 1]],
+                                 'targets': [[['A', 2], ['B', 3]]]
                              }))
 
     def testThreeTargets(self):
+        ret = select_from_datasets(
+            TestSelection._predictions, TestSelection._predictions_proba, {
+                'confidenceRange': [[0.9, 1]],
+                'targets': [[['A', 2], ['B', 3], ['C', 3]]]
+            })
         self.assertEqual({
             (0.9, 1): [('A', [0]), ('B', [3]), ('C', [6, 7, 8])]
-        },
-                         select_from_datasets(
-                             TestSelection._predictions,
-                             TestSelection._predictions_proba, {
-                                 'confidence_range': [[0.9, 1]],
-                                 'targets': [('A', 2), ('B', 3), ('C', 3)]
-                             }))
+        }, ret)
 
 
 if __name__ == '__main__':

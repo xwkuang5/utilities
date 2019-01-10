@@ -3,8 +3,12 @@ import numpy as np
 
 
 class EncodingHelper:
-
-    def __init__(self, feature_names, categorical_features, label_encoder, feature_label_encoder, feature_one_hot_encoder=None):
+    def __init__(self,
+                 feature_names,
+                 categorical_features,
+                 label_encoder,
+                 feature_label_encoder,
+                 feature_one_hot_encoder=None):
         """
 
         Args:
@@ -19,7 +23,10 @@ class EncodingHelper:
 
         self.feature_names = feature_names
         self.categorical_features = categorical_features
-        self.continuous_features = [idx for idx in range(len(self.feature_names)) if idx not in categorical_features]
+        self.continuous_features = [
+            idx for idx in range(len(self.feature_names))
+            if idx not in categorical_features
+        ]
         self.label_encoder = label_encoder
         self.feature_label_encoder = feature_label_encoder
         self.feature_one_hot_encoder = feature_one_hot_encoder
@@ -39,19 +46,23 @@ class EncodingHelper:
         in index bisect_index + 1. On the other hand, if the equality does not hold, it
         means that feature_id is in the range covered by bisect_index-1 and bisect_index
         """
-        bisect_index = bisect_index + 1 if self.acc[bisect_index] == feature_id else bisect_index
+        bisect_index = bisect_index + 1 if self.acc[
+            bisect_index] == feature_id else bisect_index
 
         # continuous features
         if feature_id >= self.sep_id:
-            feature_index = self.continuous_features[bisect_index - self.sep_index]
+            feature_index = self.continuous_features[bisect_index
+                                                     - self.sep_index]
             return feature_index, None
         # categorical features
         else:
             feature_index = self.categorical_features[bisect_index]
 
-            feature_label = feature_id - self.acc[bisect_index - 1] if bisect_index > 0 else feature_id
+            feature_label = feature_id - self.acc[bisect_index -
+                                                  1] if bisect_index > 0 else feature_id
 
-            feature_value = self.feature_label_encoder[feature_index].classes_[feature_label]
+            feature_value = self.feature_label_encoder[feature_index].classes_[
+                feature_label]
 
             return feature_index, feature_value
 
@@ -66,8 +77,10 @@ class EncodingHelper:
 
         for idx in self.categorical_features:
 
-            index_in_categorical_features = self.categorical_features.index(idx)
-            feature_count = len(categorical_feature_categories[index_in_categorical_features])
+            index_in_categorical_features = self.categorical_features.index(
+                idx)
+            feature_count = len(
+                categorical_feature_categories[index_in_categorical_features])
 
             if fea_idx == 0:
                 acc[fea_idx] = feature_count

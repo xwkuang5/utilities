@@ -47,8 +47,8 @@ def select_from_datasets(predictions, predictions_proba, config):
 
     ret_dict = {}
 
-    for confidence_range, targets in zip(config['confidenceRange'], config['targets']):
-
+    for confidence_range, targets in zip(config['confidenceRange'],
+                                         config['targets']):
         c_start, c_end = confidence_range
 
         tmp_list = []
@@ -57,17 +57,19 @@ def select_from_datasets(predictions, predictions_proba, config):
         confidence_indices = indices[np.where((inf_norm > c_start) &
                                               (inf_norm <= c_end))]
 
-        for target, count in targets:
-            target_indices = indices[np.where(predictions == target)]
+        for tup in targets:
+            # tup = [target, count]
+            target_indices = indices[np.where(predictions == tup[0])]
 
-            intersection = intersection_of_two_sorted_list(confidence_indices, target_indices)
+            intersection = intersection_of_two_sorted_list(
+                confidence_indices, target_indices)
 
-            if count > len(intersection):
+            if tup[1] > len(intersection):
                 print(
                     "Warning: required number of targets ({}) is larger than the number of satisfying targets in the dataset ({}), using {} instead".
-                        format(count, len(intersection), len(intersection)))
+                    format(tup[1], len(intersection), len(intersection)))
 
-            tmp_list.append((target, intersection[:count]))
+            tmp_list.append((tup[0], intersection[:tup[1]]))
 
         ret_dict[(c_start, c_end)] = tmp_list
 

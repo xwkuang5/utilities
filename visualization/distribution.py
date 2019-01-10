@@ -48,8 +48,11 @@ def vis_sleep_stages_distribution(records,
     sleep_stages_info = np.asarray(
         np.stack(sleep_stages_info), dtype=np.float64)
 
-    sleep_stages_info_normed = np.divide(
-        sleep_stages_info, np.sum(sleep_stages_info, axis=1, keepdims=True))
+    sleep_stages_info_normed = np.divide(sleep_stages_info,
+                                         np.sum(
+                                             sleep_stages_info,
+                                             axis=1,
+                                             keepdims=True))
     sleep_stages_info_normed_mean = np.mean(sleep_stages_info_normed, axis=0)
     sleep_stages_info_normed_std = np.std(sleep_stages_info_normed, axis=0)
 
